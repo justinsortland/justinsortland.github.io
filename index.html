@@ -21,22 +21,37 @@
                 <p>Software Engineer</p>
         </div>
         <ul>
-            <li><a href="#">
+            <li><a href="#" class="active">
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="item">Home</span>
             </a></li>
             <li><a href="#">
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="item">About</span>
             </a></li>
             <li><a href="#">
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="item">Projects</span>
             </a></li>
             <li><a href="#">
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="item">Connect</span>
             </a></li>
         </ul>
 
     </div>
+    <div class="section">
+        <div class="top_navbar">
+            <div class="hamburger">
+                <a href="#"><i class="fas fa-bars"></i></a>
+            </div>
+        </div>
+    </div>
   <script>
+    var hamburger = document.querySelector(".hamburger");
+    hamburger.addEventListener("click", function(){
+        document.querySelector("body").classList.toggle("active")
+    })
 
   </script>
 </body>
