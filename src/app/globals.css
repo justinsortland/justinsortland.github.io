@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KaTeX styles */
+@import 'katex/dist/katex.min.css';
+
+/* Custom base styles */
+@layer base {
+  :root {
+    --background: 244 244 248;
+    --foreground: 26 26 36;
+  }
+
+  .dark {
+    --background: 10 10 15;
+    --foreground: 232 232 240;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-graph-50 text-graph-900 dark:bg-graph-900 dark:text-graph-100;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-accent/30 text-graph-100;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-graph-900;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-graph-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-graph-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-graph-500;
+  }
+}
+
+@layer components {
+  /* Glass card effect */
+  .glass-card {
+    @apply bg-graph-800/60 backdrop-blur-xl border border-graph-700/50 rounded-xl;
+    box-shadow: 
+      0 4px 24px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    @apply border-accent/30 shadow-glow;
+    transform: translateY(-2px);
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium
+           bg-accent text-graph-900 transition-all duration-200
+           hover:bg-accent-dim hover:shadow-glow
+           focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 
+           focus-visible:ring-offset-graph-900;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium
+           border border-graph-600 text-graph-200 transition-all duration-200
+           hover:border-accent/50 hover:text-accent hover:bg-accent/5
+           focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 
+           focus-visible:ring-offset-graph-900;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium
+           text-graph-300 transition-all duration-200
+           hover:text-accent hover:bg-accent/10
+           focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 
+           focus-visible:ring-offset-graph-900;
+  }
+
+  /* Tag/chip styles */
+  .tag {
+    @apply inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md
+           bg-graph-700/50 text-graph-300 border border-graph-600/50
+           transition-colors duration-200;
+  }
+
+  .tag-accent {
+    @apply tag bg-accent/10 text-accent border-accent/30;
+  }
+
+  .tag-violet {
+    @apply tag bg-violet/10 text-violet border-violet/30;
+  }
+
+  .tag-amber {
+    @apply tag bg-amber/10 text-amber border-amber/30;
+  }
+
+  .tag-interactive {
+    @apply tag cursor-pointer hover:border-accent/50 hover:text-accent hover:bg-accent/10;
+  }
+
+  /* Section styles */
+  .section-container {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-display font-bold text-graph-100 mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-graph-400 mb-12 max-w-2xl;
+  }
+
+  /* Link styles */
+  .link {
+    @apply text-accent hover:text-accent-dim transition-colors duration-200 underline-offset-4 hover:underline;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-3 rounded-lg bg-graph-800 border border-graph-600
+           text-graph-100 placeholder-graph-500
+           focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent
+           transition-colors duration-200;
+  }
+
+  .textarea {
+    @apply input resize-none min-h-[120px];
+  }
+
+  /* Grid backgrounds */
+  .bg-grid {
+    background-image: 
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Code block enhancements */
+  pre {
+    @apply !bg-graph-800 border border-graph-700/50 rounded-xl overflow-x-auto;
+  }
+
+  pre > code {
+    @apply !bg-transparent p-0;
+  }
+
+  code[data-theme*=' '],
+  code[data-theme*=' '] span {
+    color: var(--shiki-light);
+  }
+
+  .dark code[data-theme*=' '],
+  .dark code[data-theme*=' '] span {
+    color: var(--shiki-dark);
+  }
+
+  /* KaTeX adjustments */
+  .katex-display {
+    @apply my-6 overflow-x-auto;
+  }
+
+  .katex {
+    @apply text-graph-100;
+  }
+}
+
+@layer utilities {
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent via-violet to-accent;
+  }
+
+  /* Animation delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+
+  /* Stagger children animations */
+  .stagger-children > * {
+    @apply opacity-0 animate-fade-up;
+  }
+  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 100ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 200ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 300ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 400ms; }
+  .stagger-children > *:nth-child(6) { animation-delay: 500ms; }
+
+  /* Glow effects */
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  }
+
+  .glow-violet {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

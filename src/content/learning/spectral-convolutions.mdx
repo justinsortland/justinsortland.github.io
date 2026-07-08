@@ -1,0 +1,164 @@
+---
+title: "Understanding Spectral Graph Convolutions"
+date: "2024-02-20"
+tags:
+  - Spectral
+  - Theory
+  - GNN
+description: "Deep dive into the mathematical foundations of spectral graph convolutions and how they connect to spatial methods like GCN."
+featured: true
+difficulty: advanced
+prerequisites:
+  - Linear algebra
+  - Basic Fourier analysis
+  - Understanding of GCN
+references:
+  - "https://arxiv.org/abs/1312.6203"
+  - "https://arxiv.org/abs/1609.02907"
+---
+
+## Motivation
+
+Why spectral? Because convolution on graphs is naturally defined in the spectral domain. Understanding this unlocks deeper intuition about what GNNs are really doing.
+
+## The Graph Laplacian
+
+For an undirected graph with adjacency matrix $A$ and degree matrix $D$:
+
+$$
+L = D - A \quad \text{(unnormalized)}
+$$
+$$
+L_{sym} = I - D^{-1/2} A D^{-1/2} \quad \text{(symmetric normalized)}
+$$
+
+The Laplacian is positive semi-definite and can be eigendecomposed:
+
+$$
+L = U \Lambda U^T
+$$
+
+where $U = [u_1, ..., u_n]$ are eigenvectors and $\Lambda = \text{diag}(\lambda_1, ..., \lambda_n)$ are eigenvalues.
+
+## Graph Fourier Transform
+
+The eigenvectors of the Laplacian form an orthonormal basis—the **graph Fourier basis**. The Graph Fourier Transform (GFT) of signal $x$:
+
+$$
+\hat{x} = U^T x
+$$
+
+And the inverse:
+
+$$
+x = U \hat{x}
+$$
+
+The eigenvalues $\lambda_i$ are the **frequencies**. Small $\lambda$ = smooth signals, large $\lambda$ = high-frequency signals.
+
+## Convolution in the Spectral Domain
+
+On regular grids, convolution theorem says:
+
+$$
+f * g = \mathcal{F}^{-1}(\mathcal{F}(f) \odot \mathcal{F}(g))
+$$
+
+For graphs:
+
+$$
+x *_G g = U (U^T x \odot U^T g) = U \text{diag}(\hat{g}) U^T x
+$$
+
+We can parameterize the filter as $g_\theta = \text{diag}(\theta)$:
+
+$$
+x *_G g_\theta = U g_\theta U^T x
+$$
+
+## The Problem: Computational Cost
+
+Computing $U$ requires eigendecomposition: $O(n^3)$. For large graphs, this is prohibitive.
+
+## Chebyshev Approximation
+
+ChebNet approximates the spectral filter using Chebyshev polynomials:
+
+$$
+g_\theta(\Lambda) \approx \sum_{k=0}^{K-1} \theta_k T_k(\tilde{\Lambda})
+$$
+
+where $T_k$ are Chebyshev polynomials and $\tilde{\Lambda} = 2\Lambda/\lambda_{max} - I$.
+
+The key insight: $T_k(L)x$ can be computed recursively without eigendecomposition!
+
+```python
+def chebyshev_basis(L, x, K):
+    """Compute Chebyshev polynomial basis up to order K"""
+    # Rescale Laplacian to [-1, 1]
+    lambda_max = estimate_largest_eigenvalue(L)
+    L_tilde = 2 * L / lambda_max - torch.eye(L.size(0))
+    
+    basis = [x]  # T_0(L)x = x
+    if K > 1:
+        basis.append(L_tilde @ x)  # T_1(L)x = Lx
+    
+    for k in range(2, K):
+        # T_k(x) = 2x*T_{k-1}(x) - T_{k-2}(x)
+        basis.append(2 * L_tilde @ basis[-1] - basis[-2])
+    
+    return torch.stack(basis, dim=0)  # [K, n, features]
+```
+
+## From Spectral to Spatial: GCN
+
+Kipf & Welling made a brilliant simplification. Setting $K=1$ (first-order approximation):
+
+$$
+g_\theta *_G x \approx \theta_0 x + \theta_1 (L - I) x = \theta_0 x - \theta_1 D^{-1/2} A D^{-1/2} x
+$$
+
+Further simplifying $\theta_0 = -\theta_1 = \theta$:
+
+$$
+g_\theta *_G x = \theta (I + D^{-1/2} A D^{-1/2}) x
+$$
+
+This is the GCN layer! The "renormalization trick" ($I + D^{-1/2} A D^{-1/2} \to \tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2}$) improves numerical stability.
+
+## Visualization: What Spectral Filtering Does
+
+```python
+import matplotlib.pyplot as plt
+
+def visualize_filter_response(eigenvalues, filter_weights):
+    plt.figure(figsize=(10, 4))
+    plt.plot(eigenvalues, filter_weights)
+    plt.xlabel('Frequency (eigenvalue)')
+    plt.ylabel('Filter response')
+    plt.title('Spectral Filter Response')
+    plt.show()
+```
+
+- **Low-pass filter**: Emphasizes smooth signals (community structure)
+- **High-pass filter**: Emphasizes high-frequency (boundaries, anomalies)
+- **Band-pass**: Specific frequency ranges
+
+## The Oversmoothing Problem
+
+Each GCN layer is a low-pass filter. Stacking many layers:
+- Repeatedly smooths the signal
+- All node features converge to the same value
+- Information is destroyed
+
+This is why deep GCNs struggle. Solutions:
+- Residual connections
+- JK-Net (jumping knowledge)
+- DeeperGCN with pre-activation
+
+## Key Takeaways
+
+1. **Spectral perspective reveals the smoothing nature** of GCNs
+2. **Chebyshev approximation** avoids expensive eigendecomposition
+3. **GCN is a first-order approximation** to spectral convolution
+4. **Understanding frequencies** helps diagnose oversmoothing

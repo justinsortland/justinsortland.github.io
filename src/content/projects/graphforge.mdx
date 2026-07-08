@@ -1,0 +1,87 @@
+---
+title: "GraphForge: Scalable GNN Library"
+description: "A high-performance graph neural network library optimized for billion-edge graphs with automatic differentiation and distributed training support."
+longDescription: "GraphForge is a production-ready library for training graph neural networks at scale. It implements state-of-the-art message-passing architectures with optimizations for memory efficiency and computational throughput."
+technologies:
+  - Python
+  - PyTorch
+  - CUDA
+  - DGL
+  - Ray
+  - Docker
+type: research
+featured: true
+github: "https://github.com/yourusername/graphforge"
+demo: "https://graphforge-demo.vercel.app"
+date: "2024-03-15"
+problem: "Existing GNN libraries struggle with graphs containing billions of edges due to memory constraints and inefficient message aggregation."
+approach: "Implemented hierarchical graph partitioning, lazy feature loading, and optimized sparse-dense operations using custom CUDA kernels."
+results: "Achieved 3.5x speedup over DGL on ogbn-papers100M benchmark while reducing peak memory by 40%."
+relatedProjects:
+  - spectral-clustering
+  - distributed-pagerank
+---
+
+## Overview
+
+GraphForge addresses the scalability challenges in training Graph Neural Networks on massive graphs. Traditional approaches load entire graphs into memory, which becomes infeasible for billion-edge networks common in social media, knowledge graphs, and molecular datasets.
+
+## Key Features
+
+### Hierarchical Graph Partitioning
+
+We implement METIS-based partitioning with overlap regions to minimize communication during distributed training:
+
+```python
+from graphforge import partition_graph
+
+partitions = partition_graph(
+    graph,
+    num_parts=8,
+    overlap_hops=2,
+    balance_factor=1.05
+)
+```
+
+### Memory-Efficient Message Passing
+
+Custom CUDA kernels for fused message aggregation reduce memory footprint:
+
+$$
+h_v^{(l+1)} = \sigma\left(W^{(l)} \cdot \text{AGGREGATE}\left(\{h_u^{(l)} : u \in \mathcal{N}(v)\}\right)\right)
+$$
+
+### Distributed Training
+
+Seamless integration with Ray for multi-node training:
+
+```python
+trainer = GraphForgeTrainer(
+    model=GATv2(hidden_dim=256, heads=8),
+    backend="ray",
+    num_workers=16
+)
+trainer.fit(data, epochs=100)
+```
+
+## Benchmarks
+
+| Dataset | Nodes | Edges | DGL Time | GraphForge Time | Speedup |
+|---------|-------|-------|----------|-----------------|---------|
+| ogbn-products | 2.4M | 61M | 142s | 89s | 1.6x |
+| ogbn-papers100M | 111M | 1.6B | OOM | 847s | ∞ |
+| MAG240M | 244M | 1.7B | OOM | 1,203s | ∞ |
+
+## Architecture
+
+The library is built around three core abstractions:
+
+1. **GraphStore**: Lazy-loading graph storage with LRU caching
+2. **Sampler**: Configurable neighborhood sampling strategies
+3. **Aggregator**: Optimized message-passing primitives
+
+## Future Work
+
+- Integration with graph databases (Neo4j, TigerGraph)
+- Support for heterogeneous graphs
+- Automatic hyperparameter tuning via neural architecture search

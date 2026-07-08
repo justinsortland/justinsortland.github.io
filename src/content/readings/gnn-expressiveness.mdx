@@ -1,0 +1,76 @@
+---
+title: "How Powerful are Graph Neural Networks?"
+date: "2024-02-15"
+tags:
+  - GNN
+  - Theory
+  - Expressiveness
+description: "Deep dive into the GIN paper that established the connection between GNN expressiveness and the Weisfeiler-Lehman graph isomorphism test."
+featured: true
+source: "https://arxiv.org/abs/1810.00826"
+authors:
+  - Xu et al.
+keyInsights:
+  - "Most GNNs are at most as powerful as the 1-WL test for distinguishing graphs"
+  - "Sum aggregation is strictly more powerful than mean or max for capturing multiset structure"
+  - "GIN with MLPs and sum achieves maximum expressiveness within the 1-WL framework"
+questions:
+  - "How do we build GNNs that go beyond 1-WL expressiveness efficiently?"
+  - "Is 1-WL expressiveness sufficient for practical applications?"
+---
+
+## The Fundamental Question
+
+This paper asks: what can GNNs actually compute? The answer connects to a classical algorithm from graph theory.
+
+## Weisfeiler-Lehman Test
+
+The WL test iteratively updates node colors:
+
+```
+1. Initialize all nodes with same color
+2. For each iteration:
+   - For each node, collect neighbor colors as multiset
+   - Hash (current_color, neighbor_multiset) to get new color
+3. If colors stabilize, two graphs have same color histograms → possibly isomorphic
+```
+
+## Main Theorem
+
+**Theorem**: A GNN with:
+- Injective aggregation function
+- Injective update function
+
+is as powerful as the WL test.
+
+The key insight: the **multiset** of neighbor features must be preserved. This rules out mean/max pooling!
+
+## GIN Architecture
+
+Graph Isomorphism Network achieves maximum expressiveness:
+
+$$
+h_v^{(k)} = \text{MLP}^{(k)}\left((1 + \epsilon^{(k)}) \cdot h_v^{(k-1)} + \sum_{u \in \mathcal{N}(v)} h_u^{(k-1)}\right)
+$$
+
+Why this works:
+1. **Sum aggregation**: Preserves the multiset (unlike mean/max)
+2. **MLP**: Universal function approximator ensures injectivity
+3. **$(1 + \epsilon)$ scaling**: Ensures node's own feature is distinguishable from aggregated neighbors
+
+## Practical Implications
+
+| Aggregator | Multiset | Example Failure |
+|------------|----------|-----------------|
+| Sum | ✓ | None within 1-WL |
+| Mean | ✗ | {1,1} vs {1,1,1,1} |
+| Max | ✗ | {1,2,3} vs {3,3,3} |
+
+## Beyond 1-WL
+
+The WL hierarchy continues: k-WL considers k-tuples of nodes. Higher-order GNNs (k-GNNs) can match k-WL but at $O(n^k)$ cost.
+
+Recent work explores:
+- Subgraph GNNs
+- Random features for symmetry breaking
+- Structural encodings (e.g., random walk PE)
