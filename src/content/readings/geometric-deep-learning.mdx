@@ -1,0 +1,82 @@
+---
+title: "Geometric Deep Learning: The Erlangen Programme of ML"
+date: "2024-01-28"
+tags:
+  - Geometric DL
+  - Theory
+  - Symmetry
+description: "Notes on the Bronstein et al. paper that unifies CNNs, GNNs, and Transformers through the lens of symmetry and invariance."
+featured: false
+source: "https://arxiv.org/abs/2104.13478"
+authors:
+  - Bronstein et al.
+keyInsights:
+  - "Most successful architectures can be derived from symmetry principles"
+  - "The key question: what transformations should the representation be invariant/equivariant to?"
+  - "Gauge equivariance provides a principled way to handle local coordinate systems on manifolds"
+questions:
+  - "How do we discover the right symmetry group for a new domain?"
+  - "Can we learn the symmetry structure from data?"
+---
+
+## The Big Picture
+
+This paper provides a unified theoretical framework for deep learning architectures based on **geometric principles**. The core idea: neural networks should respect the symmetries of the domain.
+
+## Felix Klein's Erlangen Programme
+
+In 1872, Klein proposed classifying geometries by their symmetry groups. The paper applies this to ML:
+
+| Domain | Symmetry Group | Architecture |
+|--------|---------------|--------------|
+| Grid (images) | Translations | CNN |
+| Sets | Permutations | DeepSets |
+| Graphs | Node permutations | GNN |
+| Sequences | None (or translations) | Transformer/RNN |
+| Sphere | Rotations SO(3) | Spherical CNN |
+
+## Equivariance Principle
+
+A function $f$ is **equivariant** to group $G$ if:
+
+$$
+f(g \cdot x) = g \cdot f(x) \quad \forall g \in G
+$$
+
+For classification, we want **invariance** (output unchanged). For dense prediction, we want **equivariance** (output transforms accordingly).
+
+## Message Passing as Equivariant Operation
+
+GNN message passing is permutation equivariant by construction:
+
+$$
+h_v' = \phi\left(h_v, \bigoplus_{u \in \mathcal{N}(v)} \psi(h_u, e_{uv})\right)
+$$
+
+If we permute the nodes, the output permutes accordingly. This is why GNNs can generalize to different graph sizes.
+
+## Beyond Permutation Equivariance
+
+For 3D molecular graphs, we also want **SE(3) equivariance**:
+- Rotating/translating the molecule shouldn't change predictions
+- Forces should rotate with the molecule
+
+This leads to architectures like:
+- SchNet
+- DimeNet  
+- EGNN
+- Equiformer
+
+## The Blueprint
+
+The paper provides a recipe for designing architectures:
+
+1. Identify the domain (grid, graph, manifold)
+2. Identify the symmetry group
+3. Build equivariant layers that respect the symmetry
+4. Stack layers, adding nonlinearity carefully
+5. Pool to achieve desired invariance/equivariance
+
+## My Takeaways
+
+This framework changed how I think about architecture design. Instead of asking "what architecture works?", ask "what symmetries should be preserved?" The architecture follows naturally.
