@@ -1,83 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { classes } from '@/data/classes';
+import type { ClassItem } from '@/lib/types';
 
-const topicFilters = ['All', 'ML', 'Graphs', 'Math', 'Systems', 'Algorithms'];
-
-interface ClassItem {
-  code: string;
-  title: string;
-  institution: string;
-  description: string;
-  tags: string[];
-  level: string;
-}
-
-const sampleClasses: ClassItem[] = [
-  {
-    code: 'CS 224W',
-    title: 'Machine Learning with Graphs',
-    institution: 'Stanford',
-    description: 'Graph neural networks, node embeddings, knowledge graphs.',
-    tags: ['ML', 'Graphs'],
-    level: 'Graduate',
-  },
-  {
-    code: 'CS 229',
-    title: 'Machine Learning',
-    institution: 'Stanford',
-    description: 'Supervised learning, deep learning, generalization theory.',
-    tags: ['ML', 'Math'],
-    level: 'Graduate',
-  },
-  {
-    code: 'CS 161',
-    title: 'Design and Analysis of Algorithms',
-    institution: 'Stanford',
-    description: 'Graph algorithms, dynamic programming, NP-completeness.',
-    tags: ['Algorithms', 'Graphs'],
-    level: 'Undergraduate',
-  },
-  {
-    code: 'MATH 113',
-    title: 'Linear Algebra and Matrix Theory',
-    institution: 'Stanford',
-    description: 'Eigenvalues, spectral theorem, SVD decomposition.',
-    tags: ['Math'],
-    level: 'Undergraduate',
-  },
-  {
-    code: 'CS 246',
-    title: 'Mining Massive Datasets',
-    institution: 'Stanford',
-    description: 'MapReduce, locality-sensitive hashing, recommendation systems.',
-    tags: ['Systems', 'ML'],
-    level: 'Graduate',
-  },
-  {
-    code: 'CS 261',
-    title: 'Optimization and Algorithmic Paradigms',
-    institution: 'Stanford',
-    description: 'Convex optimization, linear programming, approximation algorithms.',
-    tags: ['Math', 'Algorithms'],
-    level: 'Graduate',
-  },
-];
+const topicFilters = ['All', 'Systems', 'Distributed', 'Networking', 'Algorithms', 'Theory', 'ML', 'Deep Learning', 'Math', 'Probability'];
 
 export function ClassesSection() {
   const [activeFilter, setActiveFilter] = useState('All');
-  const [filteredClasses, setFilteredClasses] = useState(sampleClasses);
 
-  useEffect(() => {
-    if (activeFilter === 'All') {
-      setFilteredClasses(sampleClasses);
-    } else {
-      setFilteredClasses(
-        sampleClasses.filter((c) => c.tags.includes(activeFilter))
-      );
-    }
-  }, [activeFilter]);
+  const filteredClasses: ClassItem[] =
+    activeFilter === 'All'
+      ? classes
+      : classes.filter((c) => c.tags.includes(activeFilter));
 
   return (
     <section id="classes" className="py-24 md:py-32 bg-graph-800/30 relative">
@@ -86,7 +22,7 @@ export function ClassesSection() {
           <div>
             <h2 className="section-title">Coursework</h2>
             <p className="section-subtitle mb-0">
-              Foundations that shaped my understanding of computation
+              Northwestern University — foundations that shaped how I think about systems and learning
             </p>
           </div>
           <Link href="/classes" className="btn-ghost shrink-0">
@@ -130,13 +66,26 @@ export function ClassesSection() {
                 </div>
                 <span className="tag text-2xs shrink-0">{classItem.level}</span>
               </div>
-              
+
               <p className="text-sm text-graph-400 mb-4">{classItem.description}</p>
-              
+
+              {classItem.takeaways && classItem.takeaways.length > 0 && (
+                <ul className="space-y-1 mb-4">
+                  {classItem.takeaways.slice(0, 2).map((t, i) => (
+                    <li key={i} className="flex items-start gap-2 text-2xs text-graph-500">
+                      <span className="text-accent mt-0.5 shrink-0">▹</span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-1.5">
                   {classItem.tags.map((tag) => (
-                    <span key={tag} className="tag-accent text-2xs">{tag}</span>
+                    <span key={tag} className="tag-accent text-2xs">
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 <span className="text-xs text-graph-500">{classItem.institution}</span>
