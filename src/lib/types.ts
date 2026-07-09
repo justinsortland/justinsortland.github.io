@@ -11,6 +11,8 @@ export interface Project {
   voxelZone?: string;
   technologies: string[];
   tags: string[];
+  /** 2-3 concise bullets shown on the homepage project card */
+  highlights?: string[];
   github?: string;
   demo?: string;
   paper?: string;

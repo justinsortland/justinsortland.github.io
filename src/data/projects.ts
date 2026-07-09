@@ -23,6 +23,11 @@ export const projects: Project[] = [
       'AWS',
     ],
     tags: ['Finance', 'Full-Stack', 'Risk Management', 'Real-Time'],
+    highlights: [
+      'Event-driven Kafka pipeline ingests trade events and computes net counterparty exposure in real time, replacing an overnight batch process',
+      'FastAPI backend writes exposure snapshots to Redis for sub-second reads; PostgreSQL stores the full audit trail',
+      'React + TypeScript dashboard used daily by risk officers and trade desk staff',
+    ],
     github: undefined,
     date: '2024-06-01',
     problem:
@@ -105,6 +110,11 @@ where MTM is mark-to-market value and collateral reduces the gross figure. Limit
       'Xcode',
     ],
     tags: ['iOS', 'Mobile', 'ML', 'Prediction'],
+    highlights: [
+      'XGBoost classifier trained on 6 months of hourly gym entry data with time-of-day, day-of-week, calendar, and lag features',
+      'Exported to CoreML for on-device inference — no network call needed after initial model download',
+      'SwiftUI home screen + WidgetKit lock-screen widget showing color-coded 3-hour occupancy outlook',
+    ],
     github: undefined,
     date: '2023-11-01',
     problem:
@@ -189,6 +199,11 @@ coreml_model.save('SPACModel.mlpackage')
       'ADE20K',
     ],
     tags: ['Computer Vision', 'Research', 'Segmentation', 'State Space Models'],
+    highlights: [
+      'Replaced SAM\'s O(n²) ViT-H image encoder with a VisionMamba backbone using O(n) selective state-space scans',
+      'Feature distillation loss aligns Mamba patch embeddings to a frozen ViT-H teacher for transfer of spatial priors',
+      'Benchmarked on COCO + ADE20K: 2.1× throughput, 38% lower peak VRAM, −1.2% mIoU vs. baseline SAM',
+    ],
     github: undefined,
     paper: undefined,
     date: '2024-03-01',
@@ -259,6 +274,11 @@ Fine-tuned for 20 epochs on COCO + ADE20K with AdamW (lr=1e-4, weight decay=0.05
     voxelZone: 'ml-lab',
     technologies: ['Python', 'NetworkX', 'Node2Vec', 'FastAPI', 'React', 'D3.js'],
     tags: ['Graphs', 'Social Networks', 'ML', 'Embeddings'],
+    highlights: [
+      'Ego-network Jaccard similarity + Node2Vec embedding cosine distance fused into a unified structural similarity score',
+      'Node2Vec trained with BFS-biased walk (q=0.5) to capture community structure rather than local neighborhoods',
+      'FastAPI backend for graph queries; D3.js force-directed visualization renders the overlapping neighborhood',
+    ],
     github: undefined,
     date: '2023-05-01',
     problem:

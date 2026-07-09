@@ -80,8 +80,8 @@ export function VoxelHero() {
 
               {/* Tagline */}
               <p className="text-graph-300 text-lg leading-relaxed">
-                Full-stack engineer & applied-AI researcher building data-driven products.
-                Focused on ML systems, distributed backends, and computer vision.
+                Full-stack engineer building applied-AI, ML, and data-driven products.
+                Focused on AI workflows, data tooling, and computer vision.
               </p>
 
               {/* CTA buttons */}
