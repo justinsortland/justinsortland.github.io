@@ -172,10 +172,8 @@ export async function ProjectsSection() {
   const [flagship, ...rest] = projects; // priority-sorted; Counterparty is first
 
   return (
-    <section id="projects" className="py-24 md:py-32 bg-graph-900 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-violet/5 via-transparent to-transparent blur-3xl pointer-events-none" />
-
-      <div className="section-container relative z-10">
+    <section id="projects" className="py-24 md:py-32 bg-graph-900">
+      <div className="section-container">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
@@ -197,7 +195,7 @@ export async function ProjectsSection() {
 
         {/* Grid of remaining projects */}
         {rest.length > 0 && (
-          <div className="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {rest.map((p) => (
               <ProjectCard key={p.slug} project={p} />
             ))}
