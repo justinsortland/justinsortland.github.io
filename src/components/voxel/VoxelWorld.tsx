@@ -129,9 +129,10 @@ function Ground() {
 
 interface SceneContentProps {
   onNearBuilding: (b: NearBuilding) => void;
+  onBuildingClick?: (b: BuildingConfig) => void;
 }
 
-function SceneContent({ onNearBuilding }: SceneContentProps) {
+function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
   // Player position and facing direction — refs to avoid re-renders in frame loop
   const playerPos   = useRef(new Vector3(0, 0, 0));
   const playerRotY  = useRef(Math.PI); // start facing north (-Z)
@@ -236,7 +237,10 @@ function SceneContent({ onNearBuilding }: SceneContentProps) {
       {/* Buildings */}
       {BUILDINGS.map((b) => (
         <group key={b.id} position={b.position}>
-          <VoxelBuilding {...b} />
+          <VoxelBuilding
+            {...b}
+            onBuildingClick={onBuildingClick ? () => onBuildingClick(b) : undefined}
+          />
         </group>
       ))}
 
@@ -253,12 +257,19 @@ function SceneContent({ onNearBuilding }: SceneContentProps) {
 interface VoxelWorldProps {
   /** Called whenever the nearest building changes (or becomes null) */
   onNearBuilding?: (b: NearBuilding) => void;
+  /** Called when the user clicks a building label */
+  onBuildingClick?: (b: BuildingConfig) => void;
 }
 
-export default function VoxelWorld({ onNearBuilding }: VoxelWorldProps) {
+export default function VoxelWorld({ onNearBuilding, onBuildingClick }: VoxelWorldProps) {
   const handleNear = useCallback(
     (b: NearBuilding) => onNearBuilding?.(b),
     [onNearBuilding],
+  );
+
+  const handleClick = useCallback(
+    (b: BuildingConfig) => onBuildingClick?.(b),
+    [onBuildingClick],
   );
 
   return (
@@ -268,7 +279,7 @@ export default function VoxelWorld({ onNearBuilding }: VoxelWorldProps) {
       dpr={[1, 1.5]}
       style={{ display: 'block', width: '100%', height: '100%' }}
     >
-      <SceneContent onNearBuilding={handleNear} />
+      <SceneContent onNearBuilding={handleNear} onBuildingClick={handleClick} />
     </Canvas>
   );
 }

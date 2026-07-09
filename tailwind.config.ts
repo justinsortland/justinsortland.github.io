@@ -69,6 +69,7 @@ const config: Config = {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
         'float': 'float 6s ease-in-out infinite',
+        'slide-in-panel': 'slideInPanel 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       },
       keyframes: {
         fadeIn: {
@@ -78,6 +79,10 @@ const config: Config = {
         fadeUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInPanel: {
+          '0%': { opacity: '0', transform: 'translateX(100%)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         glow: {
           '0%': { boxShadow: '0 0 20px rgba(0, 212, 255, 0.1)' },
