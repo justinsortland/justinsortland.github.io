@@ -5,6 +5,10 @@ export interface Project {
   longDescription?: string;
   type: 'research' | 'engineering' | 'open-source';
   featured: boolean;
+  /** Display order; lower = more prominent */
+  priority?: number;
+  /** Which voxel-world building this project belongs to */
+  voxelZone?: string;
   technologies: string[];
   tags: string[];
   github?: string;
@@ -15,6 +19,8 @@ export interface Project {
   problem?: string;
   approach?: string;
   results?: string;
+  /** Long-form markdown rendered on the project detail page */
+  content?: string;
 }
 
 export interface Experience {
@@ -27,6 +33,8 @@ export interface Experience {
   highlights: string[];
   technologies: string[];
   type: 'full-time' | 'internship' | 'research' | 'freelance';
+  /** Which voxel-world building this experience entry belongs to */
+  voxelZone?: string;
 }
 
 export interface ClassItem {
@@ -65,6 +73,20 @@ export interface LearningPost {
   prerequisites?: string[];
   content: string;
   featured?: boolean;
+}
+
+export interface Skill {
+  name: string;
+  proficiency: 'familiar' | 'proficient' | 'expert';
+}
+
+export interface SkillGroup {
+  id: string;
+  name: string;
+  description: string;
+  /** Tailwind color key used for accent rendering, e.g. 'accent' | 'violet' | 'amber' | 'green' */
+  color: string;
+  skills: Skill[];
 }
 
 export interface BlogPost {
