@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import type { NearBuilding } from './voxel/VoxelWorld';
+import type { BuildingConfig } from './voxel/VoxelBuilding';
+import { SectionPanel } from './SectionPanel';
+import { PANEL_DATA, type BuildingPanel } from '@/data/panelData';
 
 // Dynamically import the 3-D scene so it never runs during SSR / static build.
-// The loading state fills the same space so layout does not shift.
 const VoxelWorld = dynamic(() => import('./voxel/VoxelWorld'), {
   ssr: false,
   loading: () => (
@@ -20,101 +23,191 @@ const VoxelWorld = dynamic(() => import('./voxel/VoxelWorld'), {
 
 export function VoxelHero() {
   const [nearBuilding, setNearBuilding] = useState<NearBuilding>(null);
+  const [activePanel, setActivePanel] = useState<BuildingPanel | null>(null);
 
   const handleNear = useCallback((b: NearBuilding) => {
     setNearBuilding(b);
   }, []);
 
-  const scrollToSection = (section: string) => {
-    const el = document.querySelector(section);
-    el?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const openPanel = useCallback((b: BuildingConfig) => {
+    const panel = PANEL_DATA[b.id];
+    if (panel) setActivePanel(panel);
+  }, []);
+
+  const closePanel = useCallback(() => setActivePanel(null), []);
+
+  // E key opens panel for nearest building
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'e' && e.key !== 'E') return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (nearBuilding) openPanel(nearBuilding);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [nearBuilding, openPanel]);
 
   return (
-    <section
-      className="relative h-screen bg-graph-900 overflow-hidden"
-      aria-label="Interactive voxel portfolio world"
-    >
-      {/* ── 3-D canvas fills the whole section ── */}
-      <div className="absolute inset-0">
-        <VoxelWorld onNearBuilding={handleNear} />
-      </div>
-
-      {/* ── Name / tagline card — top left ── */}
-      <div className="absolute top-6 left-6 z-10 pointer-events-none select-none">
-        <div className="glass-card px-5 py-4 max-w-xs">
-          <h1 className="font-display text-2xl font-bold text-graph-100 leading-tight">
-            Justin Sortland
-          </h1>
-          <p className="text-accent text-sm font-mono mt-0.5">
-            SWE · ML Researcher · Northwestern
-          </p>
-          <div className="flex items-center gap-1.5 mt-3">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
-            </span>
-            <span className="text-xs text-graph-400">Open to opportunities</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Controls hint — bottom left ── */}
-      <div className="absolute bottom-10 left-6 z-10 pointer-events-none select-none">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-graph-900/70 border border-graph-700/40">
-          <div className="flex gap-1">
-            {['W', 'A', 'S', 'D'].map((k) => (
-              <kbd
-                key={k}
-                className="w-6 h-6 flex items-center justify-center rounded bg-graph-700/80
-                           border border-graph-600/60 text-graph-300 text-xs font-mono"
-              >
-                {k}
-              </kbd>
-            ))}
-          </div>
-          <span className="text-graph-500 text-xs">or</span>
-          <span className="text-graph-400 text-xs">Arrow keys to move</span>
-        </div>
-      </div>
-
-      {/* ── Proximity prompt — bottom centre ── */}
-      <div
-        className={`absolute bottom-10 left-1/2 -translate-x-1/2 z-10 transition-all duration-300
-          ${nearBuilding ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+    <>
+      <section
+        className="bg-graph-900 border-b border-graph-800"
+        aria-label="Hero"
       >
-        {nearBuilding && (
-          <button
-            onClick={() => scrollToSection(nearBuilding.section)}
-            className="flex items-center gap-3 px-5 py-3 rounded-xl
-                       bg-graph-900/90 border border-accent/50
-                       text-sm font-mono text-graph-200 hover:text-accent
-                       transition-colors duration-150 cursor-pointer"
-            aria-label={`Navigate to ${nearBuilding.label} section`}
-          >
-            <span className="text-accent font-bold">{nearBuilding.label}</span>
-            <span className="text-graph-500">·</span>
-            <span>
-              Press{' '}
-              <kbd className="px-1.5 py-0.5 rounded bg-graph-700 border border-graph-600
-                             text-accent text-xs">
-                E
-              </kbd>{' '}
-              or click to view
-            </span>
-          </button>
-        )}
-      </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-14 items-center">
 
-      {/* ── Scroll hint — bottom right ── */}
-      <div className="absolute bottom-8 right-6 z-10 pointer-events-none select-none">
-        <div className="flex flex-col items-center gap-1.5 text-graph-600">
-          <span className="text-xs font-mono uppercase tracking-widest">Scroll</span>
-          <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+            {/* ── Left column: text content ─────────────────────── */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Status badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/30">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+                </span>
+                <span className="text-sm text-accent font-medium font-mono">Open to opportunities</span>
+              </div>
+
+              {/* Name */}
+              <div>
+                <h1 className="font-display text-4xl md:text-5xl font-bold text-graph-100 leading-tight">
+                  Justin Sortland
+                </h1>
+                <p className="text-accent font-mono text-sm mt-2 tracking-wide">
+                  Northwestern CS BS/MS · Class of 2025
+                </p>
+              </div>
+
+              {/* Tagline */}
+              <p className="text-graph-300 text-lg leading-relaxed">
+                Full-stack engineer building applied-AI, ML, and data-driven products.
+                Focused on AI workflows, data tooling, and computer vision.
+              </p>
+
+              {/* CTA buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="#projects"
+                  className="btn-primary text-sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Projects
+                </Link>
+                <Link
+                  href="#experience"
+                  className="btn-secondary text-sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#experience')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Experience
+                </Link>
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary text-sm"
+                >
+                  Resume ↗
+                </a>
+              </div>
+
+              {/* Social links */}
+              <div className="flex items-center gap-3 pt-1">
+                <a
+                  href="https://github.com/justinsortland"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg bg-graph-800/60 border border-graph-700/50 text-graph-400
+                             hover:text-accent hover:border-accent/50 transition-all duration-200"
+                  aria-label="GitHub"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                  </svg>
+                </a>
+                <a
+                  href="https://linkedin.com/in/justinsortland"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg bg-graph-800/60 border border-graph-700/50 text-graph-400
+                             hover:text-accent hover:border-accent/50 transition-all duration-200"
+                  aria-label="LinkedIn"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* ── Right column: bounded 3-D canvas ─────────────── */}
+            <div className="lg:col-span-3">
+              <div
+                className="relative h-64 sm:h-80 lg:h-[520px] rounded-xl overflow-hidden
+                           border border-graph-700/50 bg-graph-900"
+                aria-label="Interactive voxel portfolio world"
+              >
+                <VoxelWorld onNearBuilding={handleNear} onBuildingClick={openPanel} />
+
+                {/* Controls hint — bottom left of canvas */}
+                <div className="absolute bottom-3 left-3 z-10 pointer-events-none select-none">
+                  <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg
+                                  bg-graph-900/80 border border-graph-700/40 text-xs">
+                    <div className="flex gap-0.5">
+                      {['W', 'A', 'S', 'D'].map((k) => (
+                        <kbd
+                          key={k}
+                          className="w-5 h-5 flex items-center justify-center rounded
+                                     bg-graph-700/80 border border-graph-600/60
+                                     text-graph-300 text-[10px] font-mono"
+                        >
+                          {k}
+                        </kbd>
+                      ))}
+                    </div>
+                    <span className="text-graph-500">move</span>
+                    <span className="text-graph-600">·</span>
+                    <span className="text-graph-500">E = explore</span>
+                  </div>
+                </div>
+
+                {/* Proximity prompt — bottom centre of canvas */}
+                <div
+                  className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-10 transition-all duration-300
+                    ${nearBuilding ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+                >
+                  {nearBuilding && (
+                    <button
+                      onClick={() => openPanel(nearBuilding)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg
+                                 bg-graph-900/90 border border-accent/50
+                                 text-xs font-mono text-graph-200 hover:text-accent
+                                 transition-colors duration-150 cursor-pointer"
+                      aria-label={`Open ${nearBuilding.label} panel`}
+                    >
+                      <span className="text-accent font-bold">{nearBuilding.label}</span>
+                      <span className="text-graph-500">·</span>
+                      <kbd className="px-1 py-0.5 rounded bg-graph-700 border border-graph-600 text-accent text-[10px]">E</kbd>
+                      <span>or click</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="text-graph-600 text-xs font-mono mt-2 text-right select-none">
+                WASD / arrow keys to explore · click buildings to learn more
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ── Detail panel — rendered via portal at body level ── */}
+      {activePanel && <SectionPanel panel={activePanel} onClose={closePanel} />}
+    </>
   );
 }

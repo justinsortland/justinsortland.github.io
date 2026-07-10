@@ -6,12 +6,12 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Projects', href: '/projects' },
-  { name: 'Experience', href: '/experience' },
-  { name: 'Classes', href: '/classes' },
+  { name: 'Projects', href: '/#projects' },
+  { name: 'Experience', href: '/#experience' },
+  { name: 'Classes', href: '/#classes' },
+  { name: 'Skills', href: '/#skills' },
+  { name: 'Contact', href: '/#contact' },
   { name: 'Blog', href: '/blog' },
-  { name: 'About', href: '/about' },
 ];
 
 export function Header() {
@@ -76,11 +76,12 @@ export function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navigation.map((item) => {
-              const isActive = 
-                item.href === '/' 
-                  ? pathname === '/' 
-                  : pathname.startsWith(item.href);
-              
+              // Hash-anchor links (#section) are never highlighted — can't detect
+              // which section is in view without IntersectionObserver.
+              const isActive = item.href.startsWith('/#')
+                ? false
+                : pathname.startsWith(item.href);
+
               return (
                 <Link
                   key={item.name}
@@ -145,11 +146,10 @@ export function Header() {
         >
           <div className="flex flex-col gap-1 pt-2 border-t border-graph-700/50">
             {navigation.map((item) => {
-              const isActive = 
-                item.href === '/' 
-                  ? pathname === '/' 
-                  : pathname.startsWith(item.href);
-              
+              const isActive = item.href.startsWith('/#')
+                ? false
+                : pathname.startsWith(item.href);
+
               return (
                 <Link
                   key={item.name}

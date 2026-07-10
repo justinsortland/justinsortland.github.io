@@ -6,81 +6,78 @@ export const projects: Project[] = [
     slug: 'counterparty',
     title: 'Counterparty',
     description:
-      'Full-stack platform for managing counterparty credit exposure, trade lifecycle, and limit monitoring across fixed-income asset classes at a top-10 US custodian bank.',
+      'Applied-AI workflow platform for structured permit and document review — classifying issues by severity, tracking revision history, and producing printable reports via the Claude API.',
     type: 'engineering',
     featured: true,
     priority: 1,
     voxelZone: 'counterparty-tower',
     technologies: [
-      'React',
+      'Next.js',
       'TypeScript',
-      'Python',
-      'FastAPI',
+      'Prisma',
+      'Supabase',
+      'Claude / Anthropic',
       'PostgreSQL',
-      'Redis',
-      'Kafka',
-      'Docker',
-      'AWS',
+      'Tailwind CSS',
     ],
-    tags: ['Finance', 'Full-Stack', 'Risk Management', 'Real-Time'],
+    tags: ['Applied AI', 'Full-Stack', 'Document Review', 'Workflow'],
+    highlights: [
+      'AI review pipeline powered by the Claude API: classifies document issues by severity and generates structured, actionable feedback',
+      'Side-by-side document comparison with full revision history and diff tracking, persisted via Prisma + Supabase',
+      'Printable, shareable reports exported directly from the Next.js frontend',
+    ],
     github: undefined,
     date: '2024-06-01',
     problem:
-      'Trade desks had no real-time view of net counterparty exposure. Limit breaches were caught only after end-of-day batch runs, leaving the bank exposed for hours and requiring manual reconciliation across multiple siloed systems.',
+      'Permit and document review is manual, inconsistent, and time-consuming. Reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to track how a document evolves across revisions.',
     approach:
-      'Built an event-driven exposure engine that consumes trade events from Kafka, computes running net exposures per counterparty in real time, and surfaces limit warnings through a React dashboard. A FastAPI service handles trade ingestion and exposes REST endpoints consumed by both the UI and downstream risk systems.',
+      'Built a full-stack review workflow in Next.js where uploaded documents are passed to the Claude API for structured analysis. Claude returns severity-graded issues that are stored in Supabase via Prisma. The UI shows the original document alongside AI feedback, tracks revision history across submissions, and generates a printable report.',
     results:
-      'Reduced exposure reconciliation lag from 6+ hours to under 30 seconds. Eliminated a class of manual limit-breach errors that had previously required daily oversight from a dedicated team member.',
+      'Produces structured, severity-graded reviews with full revision history and exportable reports — replacing a manual annotation process with a consistent, auditable workflow.',
     content: `## Overview
 
-Counterparty is an internal risk management platform built for the Asset Management technology group at Northern Trust. It provides real-time visibility into counterparty credit exposure across the fixed-income book.
+Counterparty is a full-stack applied-AI platform for permit and document review. Reviewers upload documents, the app passes them through the Claude API for structured analysis, and results are organized by issue severity with full revision history.
 
 ## Problem
 
-Before this system, exposure calculation ran as an overnight batch job. A trade booked at 2 PM wouldn't surface in the risk report until the following morning's reconciliation, a gap of 12+ hours during which limits could silently be exceeded.
-
-The existing data was spread across three separate systems with no unified API, so risk officers spent significant time manually merging spreadsheets.
+Manual document review is inconsistent — different reviewers apply different standards, there is no shared rubric, and tracking changes across revisions requires comparing PDFs by hand. There is no audit trail.
 
 ## Architecture
 
 \`\`\`
-Trade Event (FIX/JSON)
+Upload (PDF / text)
         │
-     Kafka Topic
+   Next.js API Route
         │
-   Exposure Engine (Python)
-   ├── Net exposure per counterparty
-   ├── Limit comparison
-   └── Alert emission → Redis pub/sub
+   Claude API (Anthropic)
+   ├── Issue extraction
+   ├── Severity classification (critical / major / minor)
+   └── Structured JSON response
         │
-   FastAPI REST Layer
+   Prisma ORM → Supabase (PostgreSQL)
+   ├── Document versions
+   ├── Issue records
+   └── Revision history
         │
-   React Dashboard (TypeScript)
+   Next.js Frontend
+   ├── Side-by-side comparison view
+   ├── Revision timeline
+   └── Printable report export
 \`\`\`
-
-## Exposure Calculation
-
-For each counterparty \`c\`, net exposure is:
-
-\`\`\`
-E(c) = Σ MTM(trade_i) - Σ collateral_posted(c)
-\`\`\`
-
-where MTM is mark-to-market value and collateral reduces the gross figure. Limit breach fires when \`E(c) > limit(c)\`.
 
 ## Key Engineering Decisions
 
-- **Kafka for event ingestion** — decouples the trade booking system from the exposure engine; allows replay on schema changes
-- **Redis for live state** — counterparty exposure snapshots are written to Redis on each update, keeping dashboard reads sub-millisecond
-- **PostgreSQL for audit log** — every exposure calculation is persisted for regulatory audit trails
+- **Claude API for extraction** — structured output prompting produces consistent severity labels without fine-tuning
+- **Prisma + Supabase** — type-safe ORM with hosted Postgres; revision history is modeled as a linked list of document snapshots
+- **Side-by-side UI** — reviewers see original document and AI feedback in adjacent panels with synchronized scrolling
+- **Printable reports** — CSS print stylesheet renders the review as a clean, shareable document
 
-## Results
+## Features
 
-| Metric | Before | After |
-|---|---|---|
-| Reconciliation lag | 6–12 hours | < 30 seconds |
-| Manual errors per week | ~4 | 0 |
-| Dashboard load time | N/A (no dashboard) | < 200 ms |
+- Issue severity classification: critical / major / minor
+- Full revision history with diff tracking across submissions
+- Side-by-side document and feedback comparison
+- Printable, exportable reports
 `,
   },
 
@@ -89,91 +86,90 @@ where MTM is mark-to-market value and collateral reduces the gross figure. Limit
     slug: 'spactivity',
     title: 'SPACtivity — Gym Traffic Predictor',
     description:
-      'iOS app that predicts gym occupancy 30 minutes ahead using historical foot-traffic patterns and on-device CoreML inference, helping users avoid peak crowds.',
+      'Full-stack mobile data product that visualizes gym occupancy patterns and predicts traffic using time-series models, helping users plan visits around peak hours.',
     type: 'engineering',
     featured: true,
     priority: 2,
     voxelZone: 'spactivity-gym',
     technologies: [
-      'Swift',
-      'SwiftUI',
-      'CoreML',
+      'Flutter',
+      'Dart',
+      'AWS Lambda',
+      'AWS S3',
+      'AWS RDS',
+      'PostgreSQL',
+      'REST APIs',
       'Python',
-      'Scikit-learn',
-      'XGBoost',
-      'Firebase',
-      'Xcode',
     ],
-    tags: ['iOS', 'Mobile', 'ML', 'Prediction'],
+    tags: ['Mobile', 'Full-Stack', 'Data', 'Time-Series'],
+    highlights: [
+      'Time-series occupancy model trained on historical gym entry data, served via AWS Lambda REST API',
+      'Flutter mobile app with interactive traffic visualization showing predicted vs. historical occupancy across the day',
+      'AWS RDS (PostgreSQL) stores entry data; Lambda serves predictions on-demand; S3 hosts static model artifacts',
+    ],
     github: undefined,
     date: '2023-11-01',
     problem:
-      'Gym-goers at Northwestern\'s SPAC facility had no way to know how crowded it would be before leaving their dorm. Peak-hour arrivals wasted 20–30 minutes waiting for equipment.',
+      'Gym-goers at Northwestern\'s SPAC facility had no way to know how crowded it would be before arriving. Without occupancy data, planning a visit around peak hours required guesswork.',
     approach:
-      'Collected 6 months of entry-counter data via the facility\'s existing badge-scan system, engineered time-of-day, day-of-week, and term-week features, trained an XGBoost classifier for low/medium/high occupancy, exported to CoreML for on-device inference, and shipped a SwiftUI app with a 3-slot timeline widget.',
+      'Collected gym entry data and stored it in AWS RDS (PostgreSQL). Built a Python time-series model to predict occupancy by hour-of-day and day-of-week, packaged it as a Lambda function, and exposed it via REST API. Built a Flutter mobile app that fetches predictions and visualizes traffic curves.',
     results:
-      'Model achieves 87% accuracy predicting occupancy tier 30 minutes out on a held-out test set. App reached 200+ active users within the first month of launch without any paid distribution.',
+      'Users can view predicted occupancy curves by time of day, compare against historical patterns, and choose optimal visit windows based on the model output.',
     content: `## Overview
 
-SPACtivity predicts how busy Northwestern's SPAC gym will be 30 minutes in advance, so you can decide whether to head over or wait.
+SPACtivity is a full-stack mobile app that predicts and visualizes gym traffic at Northwestern's SPAC facility, letting users pick a time to go before it gets crowded.
 
-## Data Collection
+## Architecture
 
-The SPAC entry system scans student IDs at the turnstile. I obtained 6 months of anonymized hourly entry counts, giving \`~4,000\` labeled samples after aggregation.
-
-## Feature Engineering
-
-\`\`\`python
-features = [
-    'hour_of_day',       # 0–23
-    'day_of_week',       # 0=Mon … 6=Sun
-    'is_finals_week',    # binary
-    'is_break_week',     # binary
-    'term_week_number',  # 1–10
-    'lag_1h',            # entries 1 hour ago
-    'lag_1w',            # entries same hour last week
-]
 \`\`\`
-
-Labels: \`low\` (< 40 people), \`medium\` (40–100), \`high\` (> 100).
+Entry Data (historical)
+        │
+   AWS RDS (PostgreSQL)
+        │
+   Python Model (time-series)
+        │
+   AWS Lambda → REST API
+        │
+   Flutter Mobile App
+   ├── Traffic visualization (chart)
+   └── Prediction display (by time slot)
+        │
+   AWS S3 (model artifacts)
+\`\`\`
 
 ## Model
 
-XGBoost classifier trained with 5-fold cross-validation, exported to CoreML 7:
+Time-series occupancy model trained on historical entry counts, with features:
 
-\`\`\`python
-import coremltools as ct
+- Hour of day (0–23)
+- Day of week (0=Mon … 6=Sun)
+- Term week number
+- Academic calendar flags (finals week, break week)
 
-model = XGBClassifier(n_estimators=200, max_depth=4, learning_rate=0.05)
-model.fit(X_train, y_train)
+Predictions returned as occupancy level per hour slot.
 
-coreml_model = ct.converters.sklearn.convert(model, features, 'occupancy')
-coreml_model.save('SPACModel.mlpackage')
-\`\`\`
+## Mobile App (Flutter)
 
-## iOS App
+- Interactive chart showing predicted vs. historical occupancy across the day
+- Hour-by-hour breakdown with color-coded traffic levels
+- Fetches predictions on-demand from Lambda REST API
+- Dart/Flutter with clean, minimal UI
 
-- **SwiftUI** home screen with current prediction + 3-hour outlook
-- **WidgetKit** lock-screen widget showing color-coded occupancy
-- On-device inference: no network call needed after initial model download
-- Firebase for crash reporting and anonymous usage analytics
+## Infrastructure
 
-## Results
-
-| Metric | Value |
-|---|---|
-| Test accuracy | 87% |
-| Avg inference time (iPhone 14) | 2 ms |
-| Active users (month 1) | 200+ |
+- **AWS RDS** — PostgreSQL database storing historical entry records
+- **AWS Lambda** — serverless prediction endpoint, scales to zero between requests
+- **AWS S3** — stores trained model artifacts and static assets
+- **REST API** — Flutter client fetches predictions via HTTP
 `,
   },
 
   // ─── ML Research ─────────────────────────────────────────────────────────────
   {
     slug: 'sam-visionmamba',
-    title: 'SAM + VisionMamba — Efficient Segmentation',
+    title: 'SAM + VisionMamba — Sharpness-Aware Training',
     description:
-      'Research replacing SAM\'s quadratic Vision Transformer image encoder with a linear-complexity VisionMamba state-space backbone, maintaining mask quality at 2× faster inference.',
+      'ML research integrating Sharpness-Aware Minimization (SAM optimizer) into the VisionMamba state-space architecture, with ablations across MNIST, CIFAR-10, and CIFAR-100.',
     type: 'research',
     featured: true,
     priority: 3,
@@ -182,68 +178,68 @@ coreml_model.save('SPACModel.mlpackage')
       'Python',
       'PyTorch',
       'CUDA',
-      'SAM',
+      'VisionMamba',
       'Mamba',
+      'CIFAR-100',
       'HuggingFace',
-      'COCO',
-      'ADE20K',
     ],
-    tags: ['Computer Vision', 'Research', 'Segmentation', 'State Space Models'],
+    tags: ['ML Research', 'Optimization', 'State Space Models', 'Vision'],
+    highlights: [
+      'Integrated the SAM optimizer (Sharpness-Aware Minimization) into the VisionMamba training pipeline as a drop-in replacement for AdamW',
+      'Ablations across MNIST, CIFAR-10, and CIFAR-100 isolating the effect of flat-minima bias on state-space model generalization',
+      'CIFAR-100 Top-1 accuracy improved from 71.36% to 75.13% with SAM training vs. baseline AdamW',
+    ],
     github: undefined,
     paper: undefined,
     date: '2024-03-01',
     problem:
-      'SAM\'s ViT-H image encoder scales as O(n²) with image resolution, making it prohibitively slow and memory-intensive on images larger than 1024×1024. This rules out direct application to high-resolution medical and satellite imagery.',
+      'VisionMamba state-space models are less studied than Vision Transformers. It is not clear whether modern optimization strategies like Sharpness-Aware Minimization, which improve ViT generalization, transfer to SSM-based architectures.',
     approach:
-      'Replaced SAM\'s image encoder with a VisionMamba backbone (linear-complexity selective state-space model), keeping SAM\'s prompt encoder and mask decoder frozen. Fine-tuned the new encoder on COCO and ADE20K with a distillation loss that aligns patch-level features with the original ViT-H embeddings.',
+      'Implemented the SAM optimizer (dual forward-backward perturbation step) within the VisionMamba training loop. Ran controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters — comparing SAM vs. AdamW baseline for each dataset and measuring Top-1 accuracy.',
     results:
-      'Achieved within 1.2% mIoU of baseline SAM on ADE20K at 2.1× faster throughput and 38% lower peak GPU memory on 1024×1024 inputs. Submitted to Northwestern CS research showcase.',
+      'CIFAR-100 Top-1 improved from 71.36% to 75.13% with SAM training vs. AdamW baseline. Results suggest flat-minima optimization meaningfully improves generalization in state-space vision models.',
     content: `## Overview
 
-This project was conducted as part of my research assistantship in Northwestern's computer vision group. The goal was to make SAM's image understanding linear in sequence length without sacrificing segmentation quality.
+This project studies whether Sharpness-Aware Minimization (SAM) — an optimizer that explicitly seeks flat loss minima — improves generalization in VisionMamba, a state-space model (SSM) architecture for vision tasks.
 
 ## Background
 
-SAM (Segment Anything Model) uses a Vision Transformer (ViT-H) as its image encoder. Self-attention in ViT is \`O(n²)\` in the number of image patches \`n\`, which becomes a bottleneck at high resolution.
+**VisionMamba** applies selective state-space models (Mamba) to image patches, replacing attention with a linear-complexity recurrent scan. It generalizes well but has been less studied than Vision Transformers with respect to optimization strategy.
 
-**VisionMamba** applies selective state-space models (Mamba) to image patches, achieving \`O(n)\` complexity by replacing attention with a recurrent scan.
+**SAM optimizer** adds a perturbation step that finds weights lying in flat regions of the loss landscape, which tend to generalize better. It has been shown to improve ViT performance but its effect on SSM-based models is understudied.
 
-## Architecture Modification
+## Method
 
-\`\`\`
-Original SAM:
-  Image → [ViT-H Encoder] → patch embeddings → [Prompt Enc] → [Mask Dec] → masks
-
-Modified:
-  Image → [VisionMamba Encoder] → patch embeddings → [Prompt Enc] → [Mask Dec] → masks
-                                        ↑
-                             Frozen from SAM checkpoint
-\`\`\`
-
-Only the image encoder is replaced; the prompt encoder and mask decoder inherit SAM weights.
-
-## Training
-
-**Distillation objective:**
+SAM adds a two-step gradient update:
 
 \`\`\`
-L = L_mask + λ · L_distill
+# Step 1: compute perturbation
+ε̂ = ρ · ∇L(w) / ‖∇L(w)‖
 
-L_distill = MSE(f_mamba(x), f_vit(x).detach())
+# Step 2: gradient at perturbed weights
+g = ∇L(w + ε̂)
+
+# Step 3: update with base optimizer
+w ← w − η · g
 \`\`\`
 
-where \`f_vit\` is the frozen ViT-H teacher producing patch embeddings as supervision targets.
+Integrated into VisionMamba as a wrapper around the optimizer step, with ρ=0.05 (perturbation radius).
 
-Fine-tuned for 20 epochs on COCO + ADE20K with AdamW (lr=1e-4, weight decay=0.05).
+## Ablations
 
-## Results
+Controlled experiments across three benchmarks with matched hyperparameters (batch size, lr, epochs):
 
-| Model | mIoU (ADE20K) | Throughput (img/s) | Peak VRAM |
+| Dataset | AdamW (baseline) | SAM | Δ Top-1 |
 |---|---|---|---|
-| SAM ViT-H | 48.3 | 11.2 | 22 GB |
-| SAM + VisionMamba (ours) | 47.7 | 23.5 | 13.6 GB |
+| MNIST | — | — | — |
+| CIFAR-10 | — | — | — |
+| CIFAR-100 | 71.36% | 75.13% | **+3.77%** |
 
-Δ mIoU: −1.2% &nbsp;|&nbsp; Throughput gain: **+110%** &nbsp;|&nbsp; VRAM reduction: **38%**
+CIFAR-100 showed the clearest improvement, consistent with SAM's known benefit on more complex distributions.
+
+## Conclusion
+
+SAM training provides meaningful generalization improvement for VisionMamba on CIFAR-100 (+3.77% Top-1). This suggests flat-minima optimization is not ViT-specific and transfers to SSM-based vision architectures.
 `,
   },
 
@@ -252,57 +248,54 @@ Fine-tuned for 20 epochs on COCO + ADE20K with AdamW (lr=1e-4, weight decay=0.05
     slug: 'friendship-similarity',
     title: 'Friendship Similarity Analyzer',
     description:
-      'Graph-based tool that quantifies social network overlap between two users using ego-network Jaccard similarity and Node2Vec embedding cosine distance.',
+      'Applied-AI tool that quantifies structural social similarity between Reddit users by combining subreddit overlap analysis with OpenAI embedding distance.',
     type: 'engineering',
     featured: false,
     priority: 4,
     voxelZone: 'ml-lab',
-    technologies: ['Python', 'NetworkX', 'Node2Vec', 'FastAPI', 'React', 'D3.js'],
-    tags: ['Graphs', 'Social Networks', 'ML', 'Embeddings'],
+    technologies: ['Python', 'Flask', 'React', 'Reddit API', 'OpenAI API', 'NetworkX'],
+    tags: ['Applied AI', 'Social Networks', 'NLP', 'Embeddings'],
+    highlights: [
+      'Fetches user activity via the Reddit API and computes subreddit overlap with Jaccard normalization to avoid raw-count bias',
+      'Combines structural overlap with OpenAI embedding cosine similarity on user comment history for a blended similarity score',
+      'Flask REST API + React frontend with ranked similarity output',
+    ],
     github: undefined,
     date: '2023-05-01',
     problem:
-      'Social closeness between two people is typically measured by raw mutual-friend count, which ignores structural position in the broader network and heavily penalizes users with small friend lists.',
+      'Raw mutual-subreddit count is a poor similarity signal — it heavily favors high-activity users and ignores the semantic content of what users actually write.',
     approach:
-      'Modeled friend networks as undirected graphs, computed Jaccard overlap on ego-network neighborhoods, and trained Node2Vec embeddings (p=1, q=0.5, walk length=20) on the full graph. Final similarity score combines both metrics with equal weighting.',
+      'Pulled user activity via the Reddit API, computed degree-normalized Jaccard overlap on subreddit membership, and separately embedded each user\'s recent comment history with the OpenAI embeddings API. Blended both signals into a combined score. Flask serves the backend; React renders ranked results.',
     results:
-      'In a pilot study with 200 users, top-5 "most structurally similar" pairs matched qualitative closeness assessments from user surveys 78% of the time, outperforming raw mutual-friend count (61%).',
+      'Combined score outperforms raw mutual-subreddit count as a similarity heuristic, particularly for users with asymmetric activity levels, by accounting for semantic content alongside structural overlap.',
     content: `## Overview
 
-An experiment in quantifying social similarity beyond the naive "mutual friends" metric.
+A tool that computes social similarity between two Reddit users using both structural network overlap and semantic content similarity.
 
-## Why Not Just Count Mutual Friends?
+## Why Not Just Count Shared Subreddits?
 
-Mutual friend count is biased by degree. Two people with 500 friends each sharing 50 friends look identical to two people with 60 friends sharing 50 — but the latter pair are objectively far more connected in context.
+Shared subreddit count is biased by activity level. A user subscribed to 500 subreddits sharing 50 with another looks the same as two users sharing 50 out of 60 — but the latter are far more structurally similar. Raw counts also ignore what users actually post about.
 
 ## Two Similarity Signals
 
-### 1. Jaccard Ego-Network Overlap
+### 1. Jaccard Subreddit Overlap
 
-For users \`u\` and \`v\` with neighbor sets \`N(u)\` and \`N(v)\`:
+For users \`u\` and \`v\` with subreddit sets \`S(u)\` and \`S(v)\`:
 
 \`\`\`
-jaccard(u, v) = |N(u) ∩ N(v)| / |N(u) ∪ N(v)|
+jaccard(u, v) = |S(u) ∩ S(v)| / |S(u) ∪ S(v)|
 \`\`\`
 
-This is degree-normalized and bounded in [0, 1].
+Degree-normalized and bounded in [0, 1]. Pulled via Reddit API.
 
-### 2. Node2Vec Embedding Cosine Distance
+### 2. OpenAI Embedding Similarity
+
+Recent comment history for each user is embedded via the OpenAI embeddings API, then compared with cosine similarity:
 
 \`\`\`python
-from node2vec import Node2Vec
-
-model = Node2Vec(
-    G,
-    dimensions=64,
-    walk_length=20,
-    num_walks=10,
-    p=1,     # return parameter
-    q=0.5,   # in-out parameter (BFS-biased → community structure)
-)
-embeddings = model.fit(window=5, min_count=1)
-
-sim_embed = cosine_similarity(embeddings[u], embeddings[v])
+embedding_u = openai.embeddings.create(input=comments_u, model="text-embedding-3-small")
+embedding_v = openai.embeddings.create(input=comments_v, model="text-embedding-3-small")
+sim_embed = cosine_similarity(embedding_u, embedding_v)
 \`\`\`
 
 ### Combined Score
@@ -311,11 +304,12 @@ sim_embed = cosine_similarity(embeddings[u], embeddings[v])
 similarity(u, v) = 0.5 · jaccard(u, v) + 0.5 · sim_embed(u, v)
 \`\`\`
 
-## Results
+## Stack
 
-| Metric | Mutual Friends (baseline) | This System |
-|---|---|---|
-| Survey agreement (top-5) | 61% | 78% |
+- **Reddit API** — user subreddit membership and comment history
+- **OpenAI API** — text-embedding-3-small for comment embeddings
+- **Flask** — REST backend serving similarity scores
+- **React** — frontend for entering usernames and displaying ranked results
 `,
   },
 ];

@@ -29,6 +29,10 @@ export interface BuildingConfig {
  * Each even/odd floor alternates between primaryColor and secondaryColor
  * to give a layered, blocky look. An Html label floats above the roof.
  */
+interface VoxelBuildingProps extends BuildingConfig {
+  onBuildingClick?: () => void;
+}
+
 export function VoxelBuilding({
   label,
   sublabel,
@@ -40,7 +44,8 @@ export function VoxelBuilding({
   roofColor,
   emissive = '#000000',
   emissiveIntensity = 0.1,
-}: BuildingConfig) {
+  onBuildingClick,
+}: VoxelBuildingProps) {
   const floors = Array.from({ length: floorCount }, (_, i) => i);
 
   return (
@@ -74,9 +79,10 @@ export function VoxelBuilding({
         position={[0, floorCount + 1.6, 0]}
         center
         distanceFactor={12}
-        style={{ pointerEvents: 'none', userSelect: 'none' }}
+        style={{ pointerEvents: onBuildingClick ? 'auto' : 'none', userSelect: 'none' }}
       >
         <div
+          onClick={onBuildingClick}
           style={{
             background: 'rgba(10, 10, 15, 0.88)',
             border: '1px solid rgba(0, 212, 255, 0.35)',
@@ -86,6 +92,7 @@ export function VoxelBuilding({
             whiteSpace: 'nowrap',
             backdropFilter: 'blur(6px)',
             WebkitBackdropFilter: 'blur(6px)',
+            cursor: onBuildingClick ? 'pointer' : 'default',
           }}
         >
           <div
