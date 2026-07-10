@@ -36,17 +36,20 @@ export function VoxelHero() {
 
   const closePanel = useCallback(() => setActivePanel(null), []);
 
-  // E key opens panel for nearest building
+  // E toggles panel for nearest building; Escape always closes
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'e' && e.key !== 'E') return;
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      if (nearBuilding) openPanel(nearBuilding);
+      if (e.key === 'Escape') { closePanel(); return; }
+      if (e.key === 'e' || e.key === 'E') {
+        if (activePanel) closePanel();
+        else if (nearBuilding) openPanel(nearBuilding);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [nearBuilding, openPanel]);
+  }, [nearBuilding, activePanel, openPanel, closePanel]);
 
   return (
     <>
@@ -152,7 +155,11 @@ export function VoxelHero() {
                            border border-graph-700/50 bg-graph-900"
                 aria-label="Interactive voxel portfolio world"
               >
-                <VoxelWorld onNearBuilding={handleNear} onBuildingClick={openPanel} />
+                <VoxelWorld
+                  onNearBuilding={handleNear}
+                  onBuildingClick={openPanel}
+                  panelOpen={!!activePanel}
+                />
 
                 {/* Controls hint — bottom left of canvas */}
                 <div className="absolute bottom-3 left-3 z-10 pointer-events-none select-none">
@@ -176,10 +183,10 @@ export function VoxelHero() {
                   </div>
                 </div>
 
-                {/* Proximity prompt — bottom centre of canvas */}
+                {/* Proximity prompt — hidden while a panel is open */}
                 <div
                   className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-10 transition-all duration-300
-                    ${nearBuilding ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+                    ${nearBuilding && !activePanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
                 >
                   {nearBuilding && (
                     <button

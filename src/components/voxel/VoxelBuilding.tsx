@@ -29,9 +29,12 @@ export interface BuildingConfig {
 /**
  * A voxel-style building with PBR materials, a stone pedestal, and optional
  * tower setback + spire for the 'tower' variant.
+ * Label is hidden while a detail panel is open.
  */
 interface VoxelBuildingProps extends BuildingConfig {
   onBuildingClick?: () => void;
+  /** When true, hides the floating label so it doesn't compete with the open panel */
+  panelOpen?: boolean;
 }
 
 export function VoxelBuilding({
@@ -47,15 +50,13 @@ export function VoxelBuilding({
   emissive = '#000000',
   emissiveIntensity = 0.1,
   onBuildingClick,
+  panelOpen = false,
 }: VoxelBuildingProps) {
   const isTower = variant === 'tower';
   const setbackFloor = Math.floor(floorCount * 0.65);
   const floors = Array.from({ length: floorCount }, (_, i) => i);
 
-  // Tower label sits above the spire; all others just above the roof
   const labelY = isTower ? floorCount + 6.2 : floorCount + 1.6;
-
-  // Roof dimensions match the top floor width/depth
   const roofW = (isTower ? width * 0.7 : width) + 0.4;
   const roofD = (isTower ? depth * 0.7 : depth) + 0.4;
 
@@ -86,7 +87,7 @@ export function VoxelBuilding({
         );
       })}
 
-      {/* Roof slab — slightly wider than top floor */}
+      {/* Roof slab */}
       <mesh position={[0, floorCount + 0.05, 0]}>
         <boxGeometry args={[roofW, 0.1, roofD]} />
         <meshStandardMaterial
@@ -98,7 +99,7 @@ export function VoxelBuilding({
         />
       </mesh>
 
-      {/* Rooftop block (antenna base / HVAC) */}
+      {/* Rooftop HVAC block */}
       <mesh position={[0, floorCount + 0.22, 0]}>
         <boxGeometry args={[0.6, 0.24, 0.6]} />
         <meshStandardMaterial
@@ -136,53 +137,55 @@ export function VoxelBuilding({
         </>
       )}
 
-      {/* Billboard label — HTML overlay, always faces camera */}
-      <Html
-        position={[0, labelY, 0]}
-        center
-        distanceFactor={12}
-        style={{ pointerEvents: onBuildingClick ? 'auto' : 'none', userSelect: 'none' }}
-      >
-        <div
-          onClick={onBuildingClick}
-          style={{
-            background: 'rgba(8, 12, 22, 0.88)',
-            border: '1px solid rgba(0, 212, 255, 0.35)',
-            borderRadius: '5px',
-            padding: '3px 10px 4px',
-            textAlign: 'center',
-            whiteSpace: 'nowrap',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            cursor: onBuildingClick ? 'pointer' : 'default',
-          }}
+      {/* Billboard label — hidden while a detail panel is open */}
+      {!panelOpen && (
+        <Html
+          position={[0, labelY, 0]}
+          center
+          distanceFactor={12}
+          style={{ pointerEvents: onBuildingClick ? 'auto' : 'none', userSelect: 'none' }}
         >
           <div
+            onClick={onBuildingClick}
             style={{
-              color: '#00d4ff',
-              fontFamily: 'ui-monospace, monospace',
-              fontSize: '11px',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              background: 'rgba(8, 12, 22, 0.88)',
+              border: '1px solid rgba(0, 212, 255, 0.35)',
+              borderRadius: '5px',
+              padding: '3px 10px 4px',
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+              cursor: onBuildingClick ? 'pointer' : 'default',
             }}
           >
-            {label}
-          </div>
-          {sublabel && (
             <div
               style={{
-                color: '#525268',
+                color: '#00d4ff',
                 fontFamily: 'ui-monospace, monospace',
-                fontSize: '8px',
-                letterSpacing: '0.12em',
-                marginTop: '1px',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
               }}
             >
-              {sublabel}
+              {label}
             </div>
-          )}
-        </div>
-      </Html>
+            {sublabel && (
+              <div
+                style={{
+                  color: '#525268',
+                  fontFamily: 'ui-monospace, monospace',
+                  fontSize: '8px',
+                  letterSpacing: '0.12em',
+                  marginTop: '1px',
+                }}
+              >
+                {sublabel}
+              </div>
+            )}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
