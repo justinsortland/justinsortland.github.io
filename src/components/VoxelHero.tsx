@@ -164,22 +164,22 @@ export function VoxelHero() {
                 {/* Controls hint — bottom left of canvas */}
                 <div className="absolute bottom-3 left-3 z-10 pointer-events-none select-none">
                   <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg
-                                  bg-graph-900/80 border border-graph-700/40 text-xs">
+                                  bg-graph-900/90 border border-graph-700/60 text-xs">
                     <div className="flex gap-0.5">
                       {['W', 'A', 'S', 'D'].map((k) => (
                         <kbd
                           key={k}
                           className="w-5 h-5 flex items-center justify-center rounded
-                                     bg-graph-700/80 border border-graph-600/60
-                                     text-graph-300 text-[10px] font-mono"
+                                     bg-graph-700 border border-graph-500
+                                     text-graph-100 text-[10px] font-mono"
                         >
                           {k}
                         </kbd>
                       ))}
                     </div>
-                    <span className="text-graph-500">move</span>
-                    <span className="text-graph-600">·</span>
-                    <span className="text-graph-500">E = explore</span>
+                    <span className="text-graph-300">move</span>
+                    <span className="text-graph-500">·</span>
+                    <span className="text-graph-300">E = explore</span>
                   </div>
                 </div>
 
@@ -205,7 +205,7 @@ export function VoxelHero() {
                   )}
                 </div>
               </div>
-              <p className="text-graph-600 text-xs font-mono mt-2 text-right select-none">
+              <p className="text-graph-400 text-xs font-mono mt-2 text-right select-none">
                 WASD / arrow keys to explore · click buildings to learn more
               </p>
             </div>

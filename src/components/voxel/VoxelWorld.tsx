@@ -150,6 +150,23 @@ const PROP_COLLIDERS: Collider[] = [
   { cx:  24,   cz: -4,    hw: 1.05, hd: 1.05 },
   { cx: -22,   cz:  20,   hw: 1.05, hd: 1.05 },
   { cx:  20,   cz:  20,   hw: 1.05, hd: 1.05 },
+  // Benches (seat 1.6 long × 0.44 deep; rotated benches have long axis along Z)
+  { cx: -3.5,  cz:  0,    hw: 1.12, hd: 1.7  }, // bench rotY=PI/2
+  { cx:  3.5,  cz:  0,    hw: 1.12, hd: 1.7  }, // bench rotY=-PI/2
+  { cx:  0,    cz: -3.5,  hw: 1.7,  hd: 1.12 }, // bench rotY=0
+  // Lamp posts (0.12×0.12 pole + player radius)
+  { cx: -2.5,  cz: -11,   hw: 0.96, hd: 0.96 },
+  { cx:  2.5,  cz: -11,   hw: 0.96, hd: 0.96 },
+  { cx: -2.5,  cz: -19,   hw: 0.96, hd: 0.96 },
+  { cx:  2.5,  cz: -19,   hw: 0.96, hd: 0.96 },
+  { cx: -2.5,  cz:  15,   hw: 0.96, hd: 0.96 },
+  { cx:  2.5,  cz:  15,   hw: 0.96, hd: 0.96 },
+  { cx: -9,    cz:  10.5, hw: 0.96, hd: 0.96 },
+  { cx:  9,    cz:  10.5, hw: 0.96, hd: 0.96 },
+  { cx: -16,   cz:  10.5, hw: 0.96, hd: 0.96 },
+  { cx:  16,   cz:  10.5, hw: 0.96, hd: 0.96 },
+  // Info kiosk pole + screen (0.14×0.14 pole, 0.7 wide screen)
+  { cx:  5.5,  cz:  5,    hw: 0.97, hd: 0.97 },
 ];
 
 const ALL_COLLIDERS: Collider[] = [...BUILDING_COLLIDERS, ...PROP_COLLIDERS];
