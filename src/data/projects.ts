@@ -6,7 +6,7 @@ export const projects: Project[] = [
     slug: 'counterparty',
     title: 'Counterparty',
     description:
-      'Applied-AI workflow platform for structured permit and document review — classifying issues by severity, tracking revision history, and producing printable reports via the Claude API.',
+      'Full-stack applied-AI product for permit and document review. Reviewers upload documents, Claude classifies every issue by severity and generates structured feedback, and the app tracks revision history across submissions with side-by-side comparison and printable reports.',
     type: 'engineering',
     featured: true,
     priority: 1,
@@ -22,18 +22,16 @@ export const projects: Project[] = [
     ],
     tags: ['Applied AI', 'Full-Stack', 'Document Review', 'Workflow'],
     highlights: [
-      'AI review pipeline powered by the Claude API: classifies document issues by severity and generates structured, actionable feedback',
-      'Side-by-side document comparison with full revision history and diff tracking, persisted via Prisma + Supabase',
-      'Printable, shareable reports exported directly from the Next.js frontend',
+      'Claude API extracts every issue from an uploaded document and classifies it as critical, major, or minor — giving reviewers a structured checklist instead of unstructured annotations',
+      'Side-by-side comparison view shows the original document alongside AI-generated feedback; revision history tracks how each issue is addressed across resubmissions',
+      'Printable reports render the full severity-graded review as a clean, shareable document — one click from the Next.js UI',
     ],
     github: undefined,
     date: '2024-06-01',
     problem:
-      'Permit and document review is manual, inconsistent, and time-consuming. Reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to track how a document evolves across revisions.',
-    approach:
-      'Built a full-stack review workflow in Next.js where uploaded documents are passed to the Claude API for structured analysis. Claude returns severity-graded issues that are stored in Supabase via Prisma. The UI shows the original document alongside AI feedback, tracks revision history across submissions, and generates a printable report.',
+      'Permit and document review is manual and inconsistent — reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to see how a document changed between resubmissions.',
     results:
-      'Produces structured, severity-graded reviews with full revision history and exportable reports — replacing a manual annotation process with a consistent, auditable workflow.',
+      'Structured, severity-graded reviews with full revision history, side-by-side comparison, and exportable reports. Turns an unstructured annotation process into an auditable, repeatable workflow.',
     content: `## Overview
 
 Counterparty is a full-stack applied-AI platform for permit and document review. Reviewers upload documents, the app passes them through the Claude API for structured analysis, and results are organized by issue severity with full revision history.
