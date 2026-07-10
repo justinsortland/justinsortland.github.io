@@ -151,6 +151,12 @@ export function SectionPanel({ panel, onClose }: SectionPanelProps) {
           >
             {panel.ctaLabel}
           </button>
+          <p className="mt-2.5 text-center text-[10px] font-mono text-graph-600 select-none">
+            Press <kbd className="px-1 py-0.5 rounded bg-graph-800 border border-graph-700 text-graph-500 text-[9px]">E</kbd>
+            {' '}or{' '}
+            <kbd className="px-1 py-0.5 rounded bg-graph-800 border border-graph-700 text-graph-500 text-[9px]">Esc</kbd>
+            {' '}to return to campus
+          </p>
         </div>
       </div>
     </div>
