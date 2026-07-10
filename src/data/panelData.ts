@@ -1,5 +1,9 @@
 export interface PanelSection {
   heading?: string;
+  /** Secondary label shown below heading, e.g. a role name */
+  subheading?: string;
+  /** Date or range shown below heading/subheading, e.g. "Jul 2025 – Mar 2026" */
+  date?: string;
   body?: string;
   bullets?: string[];
   tags?: string[];
@@ -9,6 +13,8 @@ export interface BuildingPanel {
   id: string;
   title: string;
   subtitle: string;
+  /** Top-level date or range for project panels, e.g. "2026" or "Jun 2023 – Sep 2024" */
+  date?: string;
   accentColor: string;
   sections: PanelSection[];
   ctaLabel: string;
@@ -19,24 +25,24 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
   'counterparty-tower': {
     id: 'counterparty-tower',
     title: 'Counterparty',
-    subtitle: 'Open-Source · Projects',
+    subtitle: 'Applied-AI Document Review',
+    date: '2026',
     accentColor: '#00d4ff',
     sections: [
       {
         heading: 'Overview',
-        body: 'Counterparty is a full-stack web application that lets users browse, track, and compare MLB player statistics across every major batting and pitching category — built from scratch to handle real-world data at scale.',
+        body: 'Full-stack applied-AI platform for permit and document review. Reviewers upload documents, Claude classifies every issue by severity, and the app tracks revision history across submissions with side-by-side comparison and printable reports.',
       },
       {
         heading: 'Tech Stack',
-        tags: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'REST API', 'MLB Stats API'],
+        tags: ['Next.js', 'TypeScript', 'Prisma', 'Supabase', 'Claude / Anthropic', 'PostgreSQL', 'Tailwind CSS'],
       },
       {
         heading: 'Highlights',
         bullets: [
-          'Aggregates & normalizes data from the official MLB Stats API',
-          'Side-by-side player comparison with responsive stat tables',
-          'Efficient PostgreSQL schema with indexed queries for fast lookups',
-          'Fully typed frontend with React + TypeScript',
+          'Claude API extracts every issue and classifies it as critical, major, or minor — structured checklist instead of unstructured annotations',
+          'Side-by-side view with synchronized scroll; revision history tracks how each issue changes across resubmissions',
+          'Printable reports render the full severity-graded review as a clean, shareable document in one click',
         ],
       },
     ],
@@ -47,24 +53,24 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
   'spactivity-gym': {
     id: 'spactivity-gym',
     title: 'SPACtivity',
-    subtitle: 'ML · Productivity · Projects',
+    subtitle: 'Gym Traffic Predictor',
+    date: 'Jun 2023 – Sep 2024',
     accentColor: '#a855f7',
     sections: [
       {
         heading: 'Overview',
-        body: 'SPACtivity predicts gym traffic at Northwestern\'s Blomquist Recreation Center so students can plan their workouts around crowd levels — combining a live data pipeline, ML forecasting, and a polished mobile UI.',
+        body: "Full-stack mobile app that predicts and visualizes gym traffic at Northwestern's SPAC facility, letting users pick a time to go before it gets crowded.",
       },
       {
         heading: 'Tech Stack',
-        tags: ['React Native', 'Expo', 'Python', 'scikit-learn', 'Firebase', 'FastAPI'],
+        tags: ['Flutter', 'Dart', 'Python', 'AWS Lambda', 'AWS RDS', 'AWS S3', 'PostgreSQL'],
       },
       {
         heading: 'Highlights',
         bullets: [
-          'Automated scraper collects real-time occupancy data from the rec center portal',
-          'Random Forest model trained on historical patterns, day-of-week, and time-of-day features',
-          'Push notifications alert users when their favorite equipment area goes below a threshold',
-          'Cross-platform iOS & Android app via React Native + Expo',
+          'Time-series occupancy model trained on historical gym entry data, served via AWS Lambda REST API',
+          'Flutter mobile app with interactive traffic visualization showing predicted vs. historical occupancy across the day',
+          'AWS RDS (PostgreSQL) stores entry data; Lambda serves predictions on-demand; S3 hosts model artifacts',
         ],
       },
     ],
@@ -75,24 +81,24 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
   'ml-lab': {
     id: 'ml-lab',
     title: 'ML Research Lab',
-    subtitle: 'Computer Vision · Research · Projects',
+    subtitle: 'SAM Optimization Research',
+    date: 'Oct 2024 – Dec 2024',
     accentColor: '#f59e0b',
     sections: [
       {
         heading: 'SAM + VisionMamba',
-        body: 'Integrated Meta\'s Segment Anything Model (SAM) with VisionMamba\'s state-space architecture to improve zero-shot segmentation on satellite and medical imagery — reducing inference latency by 38% over the SAM baseline.',
+        body: 'Studied whether Sharpness-Aware Minimization (SAM optimizer) improves generalization in VisionMamba, a state-space model (SSM) architecture for vision tasks — running controlled ablations across MNIST, CIFAR-10, and CIFAR-100.',
       },
       {
         heading: 'Tech Stack',
-        tags: ['PyTorch', 'SAM', 'VisionMamba', 'CUDA', 'Python', 'Hugging Face'],
+        tags: ['Python', 'PyTorch', 'CUDA', 'VisionMamba', 'Mamba', 'CIFAR-100', 'HuggingFace'],
       },
       {
         heading: 'Research Contributions',
         bullets: [
-          'Novel adapter layer fusing SAM\'s prompt encoder with Mamba\'s selective scan blocks',
-          'Benchmarked on COCO, ADE20K, and custom aerial imagery datasets',
-          '38% latency reduction vs. vanilla SAM at equivalent mIoU',
-          'Conducted under Northwestern CS department supervision',
+          'Integrated the SAM optimizer (dual forward-backward perturbation) into the VisionMamba training pipeline as a drop-in for AdamW',
+          'Controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters',
+          'CIFAR-100 Top-1 improved from 71.36% to 75.13% — +3.77% over AdamW baseline',
         ],
       },
     ],
@@ -107,28 +113,44 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
     accentColor: '#3b82f6',
     sections: [
       {
-        heading: 'Northern Trust — SWE',
-        body: 'Full-time software engineer on the Investment Risk Technology team. Built and maintained internal risk calculation pipelines processing billions in daily AUM.',
+        heading: 'Northern Trust',
+        subheading: 'Software Engineer',
+        date: 'Jul 2025 – Mar 2026',
+        body: 'Full-time software engineer building internal data tools and Snowflake infrastructure for the Asset Management technology group.',
         bullets: [
-          'Developed Python microservices for real-time portfolio risk analytics',
-          'Migrated legacy batch jobs to event-driven architecture (Kafka)',
-          'Reduced P&L calculation runtime by 42% through query optimization',
+          'Built two Snowflake Streamlit apps: client onboarding and data-refresh settings management',
+          'Added input validation and quality checks to prevent bad data across both apps',
+          'Implemented query result caching and recent-activity views to speed up troubleshooting',
         ],
       },
       {
-        heading: 'Northwestern — Research Assistant',
-        body: 'RA in the Intelligent Information Laboratory under Prof. Doug Downey.',
+        heading: 'Northwestern University',
+        subheading: 'Research Assistant',
+        date: 'Oct 2024 – Dec 2024',
+        body: 'ML research studying the effect of Sharpness-Aware Minimization on state-space vision models.',
         bullets: [
-          'SAM + VisionMamba segmentation research (see ML Lab)',
-          'Maintained compute cluster scripts for distributed GPU training',
+          'Integrated SAM optimizer into the VisionMamba training pipeline',
+          'CIFAR-100 Top-1 improved from 71.36% to 75.13% vs. AdamW baseline',
         ],
       },
       {
-        heading: 'Northern Trust — SWE Intern',
-        body: 'Summer internship building internal tooling for the Asset Servicing division.',
+        heading: 'Northern Trust',
+        subheading: 'Software Engineering Intern',
+        date: 'Jun 2024 – Aug 2024',
+        body: 'Data engineering internship building notification infrastructure and Snowflake pipelines.',
         bullets: [
-          'Built a React dashboard surfacing custody account reconciliation diffs',
-          'Automated daily report generation, saving ~3 hours of analyst time per day',
+          'Built a Python notification framework for alerting on-call teams during Snowflake outage events',
+          'Wrote Airflow DAGs for automated data sanitization and publishing workflows',
+        ],
+      },
+      {
+        heading: 'Northwestern University',
+        subheading: 'Teaching Assistant',
+        date: 'Mar 2024 – Jun 2024',
+        body: 'TA for undergraduate CS courses.',
+        bullets: [
+          'Held weekly office hours and answered questions on Piazza',
+          'Reviewed student code and gave feedback on correctness, style, and design',
         ],
       },
     ],
@@ -205,7 +227,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
     sections: [
       {
         heading: "Let's Connect",
-        body: "I'm actively looking for full-time SWE and ML engineering roles starting Summer 2025. Whether it's about an opportunity, a project, or just to chat — I'd love to hear from you.",
+        body: "I'm open to new opportunities in software engineering and ML. Whether it's about a role, a project, or just to chat — I'd love to hear from you.",
       },
       {
         heading: 'Find Me At',

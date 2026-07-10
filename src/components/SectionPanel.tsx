@@ -78,6 +78,9 @@ export function SectionPanel({ panel, onClose }: SectionPanelProps) {
               <p className="text-graph-500 text-xs font-mono mt-0.5 uppercase tracking-widest">
                 {panel.subtitle}
               </p>
+              {panel.date && (
+                <p className="text-graph-400 text-xs font-mono mt-1">{panel.date}</p>
+              )}
             </div>
             <button
               onClick={onClose}
@@ -97,13 +100,23 @@ export function SectionPanel({ panel, onClose }: SectionPanelProps) {
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {panel.sections.map((sec, i) => (
             <div key={i}>
-              {sec.heading && (
-                <h3
-                  className="text-xs font-mono font-bold uppercase tracking-widest mb-2"
-                  style={{ color: panel.accentColor }}
-                >
-                  {sec.heading}
-                </h3>
+              {(sec.heading || sec.subheading || sec.date) && (
+                <div className="mb-2">
+                  {sec.heading && (
+                    <h3
+                      className="text-xs font-mono font-bold uppercase tracking-widest"
+                      style={{ color: panel.accentColor }}
+                    >
+                      {sec.heading}
+                    </h3>
+                  )}
+                  {sec.subheading && (
+                    <p className="text-graph-200 text-sm font-medium mt-0.5">{sec.subheading}</p>
+                  )}
+                  {sec.date && (
+                    <p className="text-graph-400 text-xs font-mono mt-0.5">{sec.date}</p>
+                  )}
+                </div>
               )}
               {sec.body && (
                 <p className="text-graph-300 text-sm leading-relaxed">{sec.body}</p>

@@ -80,6 +80,9 @@ function FlagshipCard({ project }: { project: Project }) {
           <div className="flex items-center gap-3">
             <TypeBadge type={project.type} />
             <span className="text-xs font-mono text-graph-500 uppercase tracking-widest">Flagship</span>
+            {project.dateDisplay && (
+              <span className="ml-auto text-xs font-mono text-graph-500">{project.dateDisplay}</span>
+            )}
           </div>
 
           <div>
@@ -131,6 +134,9 @@ function ProjectCard({ project }: { project: Project }) {
     <div className="glass-card p-6 flex flex-col gap-4 hover:border-graph-600/70 transition-colors duration-200">
       <div className="flex items-start justify-between gap-3">
         <TypeBadge type={project.type} />
+        {project.dateDisplay && (
+          <span className="text-xs font-mono text-graph-500 shrink-0">{project.dateDisplay}</span>
+        )}
       </div>
 
       <div>

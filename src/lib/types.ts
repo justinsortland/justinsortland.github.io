@@ -17,6 +17,8 @@ export interface Project {
   demo?: string;
   paper?: string;
   date: string;
+  /** Human-readable date or range shown on cards, e.g. "2026" or "Jun 2023 – Sep 2024" */
+  dateDisplay?: string;
   image?: string;
   problem?: string;
   approach?: string;

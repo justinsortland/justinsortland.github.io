@@ -27,7 +27,8 @@ export const projects: Project[] = [
       'Printable reports render the full severity-graded review as a clean, shareable document in one click',
     ],
     github: undefined,
-    date: '2024-06-01',
+    date: '2026-01-01',
+    dateDisplay: '2026',
     problem:
       'Permit and document review is manual and inconsistent: reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to see how a document changed between resubmissions.',
     results:
@@ -106,7 +107,8 @@ Upload (PDF / text)
       'AWS RDS (PostgreSQL) stores entry data; Lambda serves predictions on-demand; S3 hosts static model artifacts',
     ],
     github: undefined,
-    date: '2023-11-01',
+    date: '2023-06-01',
+    dateDisplay: 'Jun 2023 – Sep 2024',
     problem:
       'Gym-goers at Northwestern\'s SPAC facility had no way to know how crowded it would be before arriving. Without occupancy data, planning a visit around peak hours required guesswork.',
     approach:
@@ -189,7 +191,8 @@ Predictions returned as occupancy level per hour slot.
     ],
     github: undefined,
     paper: undefined,
-    date: '2024-03-01',
+    date: '2024-10-01',
+    dateDisplay: 'Oct 2024 – Dec 2024',
     problem:
       'VisionMamba state-space models are less studied than Vision Transformers. It is not clear whether modern optimization strategies like Sharpness-Aware Minimization, which improve ViT generalization, transfer to SSM-based architectures.',
     approach:
@@ -259,7 +262,8 @@ SAM training provides meaningful generalization improvement for VisionMamba on C
       'Flask REST API + React frontend with ranked similarity output',
     ],
     github: undefined,
-    date: '2023-05-01',
+    date: '2024-09-01',
+    dateDisplay: 'Sep 2024 – Dec 2024',
     problem:
       'Raw mutual-subreddit count is a poor similarity signal: it favors high-activity users and ignores the semantic content of what users actually write.',
     approach:
