@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Group, Vector3 } from 'three';
 import { VoxelAvatar } from './VoxelAvatar';
@@ -27,9 +27,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#projects',
     position: [-16, 0, -14],
     width: 3.5,  depth: 3.5,  floorCount: 9,
-    primaryColor: '#0a1628',   secondaryColor: '#0d1e35',
+    variant: 'tower',
+    primaryColor: '#3a5878',   secondaryColor: '#2e4666',
     roofColor: '#00d4ff',
-    emissive: '#001e2e',       emissiveIntensity: 0.2,
+    emissive: '#001e2e',       emissiveIntensity: 0.15,
     proximityRadius: 7,
   },
   {
@@ -39,9 +40,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#projects',
     position: [16, 0, -14],
     width: 8,    depth: 5,    floorCount: 3,
-    primaryColor: '#18082a',   secondaryColor: '#1d0c32',
+    variant: 'gym',
+    primaryColor: '#5c3070',   secondaryColor: '#4a2460',
     roofColor: '#a855f7',
-    emissive: '#12042a',       emissiveIntensity: 0.2,
+    emissive: '#12042a',       emissiveIntensity: 0.12,
     proximityRadius: 8,
   },
   {
@@ -51,9 +53,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#projects',
     position: [0, 0, -26],
     width: 4.5,  depth: 4.5,  floorCount: 6,
-    primaryColor: '#18100a',   secondaryColor: '#1e140a',
+    variant: 'lab',
+    primaryColor: '#8a6818',   secondaryColor: '#7a5810',
     roofColor: '#f59e0b',
-    emissive: '#1a0e00',       emissiveIntensity: 0.15,
+    emissive: '#1a0e00',       emissiveIntensity: 0.1,
     proximityRadius: 7,
   },
   {
@@ -63,9 +66,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#experience',
     position: [-20, 0, 8],
     width: 6,    depth: 4.5,  floorCount: 5,
-    primaryColor: '#0d1830',   secondaryColor: '#101d38',
+    variant: 'office',
+    primaryColor: '#1e4060',   secondaryColor: '#183452',
     roofColor: '#3b82f6',
-    emissive: '#080f1e',       emissiveIntensity: 0.15,
+    emissive: '#080f1e',       emissiveIntensity: 0.1,
     proximityRadius: 8,
   },
   {
@@ -75,9 +79,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#classes',
     position: [20, 0, 8],
     width: 7,    depth: 5,    floorCount: 4,
-    primaryColor: '#120a22',   secondaryColor: '#17102c',
+    variant: 'library',
+    primaryColor: '#3a2a60',   secondaryColor: '#2e2050',
     roofColor: '#7c3aed',
-    emissive: '#0d0618',       emissiveIntensity: 0.15,
+    emissive: '#0d0618',       emissiveIntensity: 0.1,
     proximityRadius: 8,
   },
   {
@@ -87,9 +92,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#skills',
     position: [-14, 0, 22],
     width: 5,    depth: 4,    floorCount: 3,
-    primaryColor: '#1a0c00',   secondaryColor: '#221000',
+    variant: 'workshop',
+    primaryColor: '#7a3c14',   secondaryColor: '#6a2c0c',
     roofColor: '#ea580c',
-    emissive: '#140800',       emissiveIntensity: 0.12,
+    emissive: '#140800',       emissiveIntensity: 0.08,
     proximityRadius: 7,
   },
   {
@@ -99,9 +105,10 @@ const BUILDINGS: BuildingConfig[] = [
     section: '#contact',
     position: [14, 0, 22],
     width: 3.5,  depth: 3.5,  floorCount: 4,
-    primaryColor: '#00151f',   secondaryColor: '#001a28',
+    variant: 'portal',
+    primaryColor: '#186060',   secondaryColor: '#105050',
     roofColor: '#00e5ff',
-    emissive: '#003050',       emissiveIntensity: 0.55,
+    emissive: '#003050',       emissiveIntensity: 0.4,
     proximityRadius: 7,
   },
 ];
@@ -111,21 +118,110 @@ const BUILDING_XZ = BUILDINGS.map((b) => ({ x: b.position[0], z: b.position[2] }
 
 export type NearBuilding = BuildingConfig | null;
 
-// ─── Inner scene (rendered inside the R3F Canvas) ─────────────────────────────
+// ─── Voxel tree ───────────────────────────────────────────────────────────────
+
+function VoxelTree({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Trunk */}
+      <mesh position={[0, 0.6, 0]}>
+        <boxGeometry args={[0.3, 1.2, 0.3]} />
+        <meshStandardMaterial color="#6b4c2a" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* Lower canopy */}
+      <mesh position={[0, 2.0, 0]}>
+        <boxGeometry args={[1.6, 1.2, 1.6]} />
+        <meshStandardMaterial color="#4a7c3f" roughness={0.85} metalness={0} />
+      </mesh>
+      {/* Mid canopy */}
+      <mesh position={[0, 2.9, 0]}>
+        <boxGeometry args={[1.1, 1.0, 1.1]} />
+        <meshStandardMaterial color="#5a9040" roughness={0.85} metalness={0} />
+      </mesh>
+      {/* Top canopy */}
+      <mesh position={[0, 3.65, 0]}>
+        <boxGeometry args={[0.7, 0.8, 0.7]} />
+        <meshStandardMaterial color="#6aab48" roughness={0.85} metalness={0} />
+      </mesh>
+    </group>
+  );
+}
+
+// ─── Rock cluster ─────────────────────────────────────────────────────────────
+
+function Rock({ position, rotY = 0, scale = 1 }: {
+  position: [number, number, number];
+  rotY?: number;
+  scale?: number;
+}) {
+  return (
+    <mesh position={position} rotation={[0, rotY, 0]}>
+      <boxGeometry args={[0.6 * scale, 0.35 * scale, 0.5 * scale]} />
+      <meshStandardMaterial color="#a09888" roughness={1.0} metalness={0} />
+    </mesh>
+  );
+}
+
+// ─── Ground environment ───────────────────────────────────────────────────────
 
 function Ground() {
   return (
     <>
-      {/* Base ground plane */}
+      {/* Grass field */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
         <planeGeometry args={[200, 200]} />
-        <meshLambertMaterial color="#0c0c14" />
+        <meshStandardMaterial color="#7a9c5e" roughness={1.0} metalness={0} />
       </mesh>
-      {/* Voxel grid — subtle, not a dominant feature */}
-      <gridHelper args={[120, 60, '#1a1a28', '#14141e']} />
+
+      {/* Central stone plaza */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
+        <planeGeometry args={[14, 14]} />
+        <meshStandardMaterial color="#b8ae9e" roughness={0.9} metalness={0} />
+      </mesh>
+
+      {/* Stone paths — laid slightly above grass to prevent z-fighting */}
+      {/* North axis (toward ML Lab / Counterparty / SPACtivity) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, -20]}>
+        <planeGeometry args={[3, 20]} />
+        <meshStandardMaterial color="#b0a898" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* South axis (toward Skills / Contact) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 21]}>
+        <planeGeometry args={[3, 22]} />
+        <meshStandardMaterial color="#b0a898" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* West spur (toward Experience) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-14, 0.001, 5]}>
+        <planeGeometry args={[15, 3]} />
+        <meshStandardMaterial color="#b0a898" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* East spur (toward Classes) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[14, 0.001, 5]}>
+        <planeGeometry args={[15, 3]} />
+        <meshStandardMaterial color="#b0a898" roughness={0.9} metalness={0} />
+      </mesh>
+
+      {/* Trees — flanking paths and plazas */}
+      <VoxelTree position={[-8,  0, -8]}  />
+      <VoxelTree position={[ 8,  0, -8]}  />
+      <VoxelTree position={[-10, 0,  4]}  />
+      <VoxelTree position={[ 10, 0,  4]}  />
+      <VoxelTree position={[-6,  0, 17]}  />
+      <VoxelTree position={[ 6,  0, 17]}  />
+      <VoxelTree position={[ 0,  0, -19]} />
+      <VoxelTree position={[-24, 0, -3]}  />
+      <VoxelTree position={[ 24, 0, -3]}  />
+
+      {/* Rocks */}
+      <Rock position={[-11, 0.1, -11]} rotY={0.4}  scale={1.2} />
+      <Rock position={[ 12, 0.1, -10]} rotY={1.1}  scale={0.9} />
+      <Rock position={[-19, 0.1,  18]} rotY={0.7}  scale={1.0} />
+      <Rock position={[ 19, 0.1,  18]} rotY={2.1}  scale={1.1} />
     </>
   );
 }
+
+// ─── Inner scene (rendered inside the R3F Canvas) ─────────────────────────────
 
 interface SceneContentProps {
   onNearBuilding: (b: NearBuilding) => void;
@@ -133,16 +229,11 @@ interface SceneContentProps {
 }
 
 function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
-  // Player position and facing direction — refs to avoid re-renders in frame loop
   const playerPos   = useRef(new Vector3(0, 0, 0));
-  const playerRotY  = useRef(Math.PI); // start facing north (-Z)
+  const playerRotY  = useRef(Math.PI);
   const isMovingRef = useRef(false);
   const avatarGroup = useRef<Group>(null);
-
-  // Track current near building id so we only call setState on change
   const currentNearId = useRef<string | null>(null);
-
-  // Temporary vector reused every frame (avoids per-frame GC)
   const camTarget = useRef(new Vector3(0, 10, 14));
 
   const keys    = usePlayerControls();
@@ -164,7 +255,6 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
     isMovingRef.current = moving;
 
     if (moving) {
-      // Normalize diagonal so speed is equal in all directions
       const len = Math.sqrt(dx * dx + dz * dz);
       dx /= len;
       dz /= len;
@@ -174,7 +264,6 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
       playerPos.current.z = Math.max(-42, Math.min(42,
         playerPos.current.z + dz * SPEED * delta));
 
-      // Avatar faces the direction of movement
       playerRotY.current = Math.atan2(dx, dz);
     }
 
@@ -190,7 +279,6 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
       playerPos.current.y + 10,
       playerPos.current.z + 14,
     );
-    // Smooth lerp toward target
     camera.position.x += (camTarget.current.x - camera.position.x) * 0.08;
     camera.position.y += (camTarget.current.y - camera.position.y) * 0.08;
     camera.position.z += (camTarget.current.z - camera.position.z) * 0.08;
@@ -212,7 +300,6 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
       }
     }
 
-    // Only trigger React state update when the nearest building actually changes
     const nearId = nearestBuilding?.id ?? null;
     if (nearId !== currentNearId.current) {
       currentNearId.current = nearId;
@@ -222,15 +309,22 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
 
   return (
     <>
-      {/* Scene globals */}
-      <color attach="background" args={['#0a0a0f']} />
-      <fog attach="fog" args={['#0a0a0f', 30, 72]} />
+      {/* Sky + fog */}
+      <color attach="background" args={['#b8d4ec']} />
+      <fog attach="fog" args={['#c0d8f0', 55, 105]} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.55} color="#1a1a3a" />
-      <directionalLight position={[10, 22, 10]} intensity={1.1} color="#e8eeff" />
-      {/* Subtle cyan fill from below for voxel-world atmosphere */}
-      <pointLight position={[0, 4, 0]} intensity={0.4} color="#00d4ff" distance={30} />
+      {/* Lighting — daylight hemisphere + warm sun + cool fill */}
+      <hemisphereLight args={['#87ceeb', '#8b9e6e', 0.8]} />
+      <ambientLight intensity={0.3} color="#fff4e0" />
+      {/* Main sun — warm golden from upper-right-front */}
+      <directionalLight
+        position={[25, 35, 15]}
+        intensity={1.5}
+        color="#ffe8b0"
+        castShadow
+      />
+      {/* Cool fill from upper-left-back */}
+      <directionalLight position={[-10, 15, -20]} intensity={0.35} color="#b0d0ff" />
 
       <Ground />
 
@@ -244,7 +338,7 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
         </group>
       ))}
 
-      {/* Player avatar — position/rotation driven by useFrame above */}
+      {/* Player avatar */}
       <group ref={avatarGroup}>
         <VoxelAvatar isMovingRef={isMovingRef} />
       </group>
@@ -255,9 +349,7 @@ function SceneContent({ onNearBuilding, onBuildingClick }: SceneContentProps) {
 // ─── Public export (includes Canvas + 2-D overlays) ──────────────────────────
 
 interface VoxelWorldProps {
-  /** Called whenever the nearest building changes (or becomes null) */
   onNearBuilding?: (b: NearBuilding) => void;
-  /** Called when the user clicks a building label */
   onBuildingClick?: (b: BuildingConfig) => void;
 }
 
@@ -274,8 +366,8 @@ export default function VoxelWorld({ onNearBuilding, onBuildingClick }: VoxelWor
 
   return (
     <Canvas
-      camera={{ position: [0, 10, 14], fov: 60, near: 0.1, far: 110 }}
-      gl={{ antialias: false }}
+      camera={{ position: [0, 10, 14], fov: 60, near: 0.1, far: 120 }}
+      gl={{ antialias: true }}
       dpr={[1, 1.5]}
       style={{ display: 'block', width: '100%', height: '100%' }}
     >

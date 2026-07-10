@@ -16,6 +16,8 @@ export interface BuildingConfig {
   depth: number;
   /** Number of 1-unit-tall block layers */
   floorCount: number;
+  /** Building archetype — drives setbacks and spires */
+  variant?: string;
   primaryColor: string;
   secondaryColor: string;
   roofColor: string;
@@ -25,9 +27,8 @@ export interface BuildingConfig {
 }
 
 /**
- * A voxel-style building made of stacked BoxGeometry blocks.
- * Each even/odd floor alternates between primaryColor and secondaryColor
- * to give a layered, blocky look. An Html label floats above the roof.
+ * A voxel-style building with PBR materials, a stone pedestal, and optional
+ * tower setback + spire for the 'tower' variant.
  */
 interface VoxelBuildingProps extends BuildingConfig {
   onBuildingClick?: () => void;
@@ -39,6 +40,7 @@ export function VoxelBuilding({
   width,
   depth,
   floorCount,
+  variant,
   primaryColor,
   secondaryColor,
   roofColor,
@@ -46,37 +48,97 @@ export function VoxelBuilding({
   emissiveIntensity = 0.1,
   onBuildingClick,
 }: VoxelBuildingProps) {
+  const isTower = variant === 'tower';
+  const setbackFloor = Math.floor(floorCount * 0.65);
   const floors = Array.from({ length: floorCount }, (_, i) => i);
+
+  // Tower label sits above the spire; all others just above the roof
+  const labelY = isTower ? floorCount + 6.2 : floorCount + 1.6;
+
+  // Roof dimensions match the top floor width/depth
+  const roofW = (isTower ? width * 0.7 : width) + 0.4;
+  const roofD = (isTower ? depth * 0.7 : depth) + 0.4;
 
   return (
     <group>
-      {/* Stacked floor slabs */}
-      {floors.map((i) => (
-        <mesh key={i} position={[0, i + 0.46, 0]}>
-          <boxGeometry args={[width, 0.9, depth]} />
-          <meshLambertMaterial
-            color={i % 2 === 0 ? primaryColor : secondaryColor}
-            emissive={emissive}
-            emissiveIntensity={emissiveIntensity}
-          />
-        </mesh>
-      ))}
-
-      {/* Roof slab — slightly wider than the building */}
-      <mesh position={[0, floorCount + 0.05, 0]}>
-        <boxGeometry args={[width + 0.4, 0.1, depth + 0.4]} />
-        <meshLambertMaterial color={roofColor} emissive={roofColor} emissiveIntensity={0.3} />
+      {/* Stone base pedestal */}
+      <mesh position={[0, 0.08, 0]}>
+        <boxGeometry args={[width + 1.0, 0.16, depth + 1.0]} />
+        <meshStandardMaterial color="#b0a898" roughness={0.9} metalness={0} />
       </mesh>
 
-      {/* Rooftop block (antenna base / utility block) */}
+      {/* Stacked floor slabs */}
+      {floors.map((i) => {
+        const isUpper = isTower && i >= setbackFloor;
+        const fw = isUpper ? width * 0.7 : width;
+        const fd = isUpper ? depth * 0.7 : depth;
+        return (
+          <mesh key={i} position={[0, i + 0.46, 0]}>
+            <boxGeometry args={[fw, 0.9, fd]} />
+            <meshStandardMaterial
+              color={i % 2 === 0 ? primaryColor : secondaryColor}
+              emissive={emissive}
+              emissiveIntensity={emissiveIntensity}
+              roughness={0.65}
+              metalness={0.15}
+            />
+          </mesh>
+        );
+      })}
+
+      {/* Roof slab — slightly wider than top floor */}
+      <mesh position={[0, floorCount + 0.05, 0]}>
+        <boxGeometry args={[roofW, 0.1, roofD]} />
+        <meshStandardMaterial
+          color={roofColor}
+          emissive={roofColor}
+          emissiveIntensity={0.25}
+          roughness={0.5}
+          metalness={0.2}
+        />
+      </mesh>
+
+      {/* Rooftop block (antenna base / HVAC) */}
       <mesh position={[0, floorCount + 0.22, 0]}>
         <boxGeometry args={[0.6, 0.24, 0.6]} />
-        <meshLambertMaterial color={roofColor} emissive={roofColor} emissiveIntensity={0.5} />
+        <meshStandardMaterial
+          color={roofColor}
+          emissive={roofColor}
+          emissiveIntensity={0.45}
+          roughness={0.4}
+          metalness={0.2}
+        />
       </mesh>
+
+      {/* Tower-only: spire shaft + tip */}
+      {isTower && (
+        <>
+          <mesh position={[0, floorCount + 2.4, 0]}>
+            <boxGeometry args={[0.18, 4.0, 0.18]} />
+            <meshStandardMaterial
+              color={roofColor}
+              emissive={roofColor}
+              emissiveIntensity={0.65}
+              roughness={0.35}
+              metalness={0.3}
+            />
+          </mesh>
+          <mesh position={[0, floorCount + 4.7, 0]}>
+            <boxGeometry args={[0.1, 0.6, 0.1]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              emissive={roofColor}
+              emissiveIntensity={1.0}
+              roughness={0.2}
+              metalness={0.5}
+            />
+          </mesh>
+        </>
+      )}
 
       {/* Billboard label — HTML overlay, always faces camera */}
       <Html
-        position={[0, floorCount + 1.6, 0]}
+        position={[0, labelY, 0]}
         center
         distanceFactor={12}
         style={{ pointerEvents: onBuildingClick ? 'auto' : 'none', userSelect: 'none' }}
@@ -84,7 +146,7 @@ export function VoxelBuilding({
         <div
           onClick={onBuildingClick}
           style={{
-            background: 'rgba(10, 10, 15, 0.88)',
+            background: 'rgba(8, 12, 22, 0.88)',
             border: '1px solid rgba(0, 212, 255, 0.35)',
             borderRadius: '5px',
             padding: '3px 10px 4px',
