@@ -15,36 +15,36 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://justinsortland.github.io'),
   title: {
-    default: 'Justin Sortland | Graph-minded ML Builder',
+    default: 'Justin Sortland | Software Engineer',
     template: '%s | Justin Sortland',
   },
-  description: 'Personal portfolio of Justin Sortland - exploring the intersection of graph theory, machine learning, and mathematical optimization.',
-  keywords: ['machine learning', 'graph theory', 'AI', 'mathematics', 'software engineering', 'neural networks'],
+  description: 'Portfolio of Justin Sortland — Northwestern CS, full-stack engineer building applied-AI, ML, and data-driven products.',
+  keywords: ['software engineering', 'machine learning', 'applied AI', 'full-stack', 'Next.js', 'Python', 'Northwestern'],
   authors: [{ name: 'Justin Sortland' }],
   creator: 'Justin Sortland',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://yoursite.com',
+    url: 'https://justinsortland.github.io',
     siteName: 'Justin Sortland',
-    title: 'Justin Sortland | Graph-minded ML Builder',
-    description: 'Exploring the intersection of graph theory, machine learning, and mathematical optimization.',
+    title: 'Justin Sortland | Software Engineer',
+    description: 'Full-stack engineer building applied-AI, ML, and data-driven products. Northwestern CS.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Justin Sortland - Graph-minded ML Builder',
+        alt: 'Justin Sortland — Software Engineer',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Justin Sortland | Graph-minded ML Builder',
-    description: 'Exploring the intersection of graph theory, machine learning, and mathematical optimization.',
+    title: 'Justin Sortland | Software Engineer',
+    description: 'Full-stack engineer building applied-AI, ML, and data-driven products. Northwestern CS.',
     images: ['/og-image.png'],
-    creator: '@yourhandle',
   },
   robots: {
     index: true,
