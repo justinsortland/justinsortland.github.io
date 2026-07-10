@@ -179,7 +179,7 @@ export async function ProjectsSection() {
           <div>
             <h2 className="section-title">Projects</h2>
             <p className="section-subtitle mb-0">
-              Engineering and research work — shipped, benchmarked, or in progress
+              Engineering and research work, shipped, benchmarked, or in progress
             </p>
           </div>
           <Link href="/projects" className="btn-ghost shrink-0">

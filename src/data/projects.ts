@@ -22,14 +22,14 @@ export const projects: Project[] = [
     ],
     tags: ['Applied AI', 'Full-Stack', 'Document Review', 'Workflow'],
     highlights: [
-      'Claude API extracts every issue from an uploaded document and classifies it as critical, major, or minor — giving reviewers a structured checklist instead of unstructured annotations',
-      'Side-by-side comparison view shows the original document alongside AI-generated feedback; revision history tracks how each issue is addressed across resubmissions',
-      'Printable reports render the full severity-graded review as a clean, shareable document — one click from the Next.js UI',
+      'Claude API extracts every issue from an uploaded document and classifies it as critical, major, or minor, giving reviewers a structured checklist instead of unstructured annotations',
+      'Side-by-side view shows the original document alongside AI-generated feedback; revision history tracks how each issue changes across resubmissions',
+      'Printable reports render the full severity-graded review as a clean, shareable document in one click',
     ],
     github: undefined,
     date: '2024-06-01',
     problem:
-      'Permit and document review is manual and inconsistent — reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to see how a document changed between resubmissions.',
+      'Permit and document review is manual and inconsistent: reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to see how a document changed between resubmissions.',
     results:
       'Structured, severity-graded reviews with full revision history, side-by-side comparison, and exportable reports. Turns an unstructured annotation process into an auditable, repeatable workflow.',
     content: `## Overview
@@ -82,7 +82,7 @@ Upload (PDF / text)
   // ─── Second Project ───────────────────────────────────────────────────────────
   {
     slug: 'spactivity',
-    title: 'SPACtivity — Gym Traffic Predictor',
+    title: 'SPACtivity: Gym Traffic Predictor',
     description:
       'Full-stack mobile data product that visualizes gym occupancy patterns and predicts traffic using time-series models, helping users plan visits around peak hours.',
     type: 'engineering',
@@ -112,7 +112,7 @@ Upload (PDF / text)
     approach:
       'Collected gym entry data and stored it in AWS RDS (PostgreSQL). Built a Python time-series model to predict occupancy by hour-of-day and day-of-week, packaged it as a Lambda function, and exposed it via REST API. Built a Flutter mobile app that fetches predictions and visualizes traffic curves.',
     results:
-      'Users can view predicted occupancy curves by time of day, compare against historical patterns, and choose optimal visit windows based on the model output.',
+      'Users see predicted occupancy by time of day, compare against historical patterns, and pick when to go.',
     content: `## Overview
 
 SPACtivity is a full-stack mobile app that predicts and visualizes gym traffic at Northwestern's SPAC facility, letting users pick a time to go before it gets crowded.
@@ -165,7 +165,7 @@ Predictions returned as occupancy level per hour slot.
   // ─── ML Research ─────────────────────────────────────────────────────────────
   {
     slug: 'sam-visionmamba',
-    title: 'SAM + VisionMamba — Sharpness-Aware Training',
+    title: 'SAM + VisionMamba: Sharpness-Aware Training',
     description:
       'ML research integrating Sharpness-Aware Minimization (SAM optimizer) into the VisionMamba state-space architecture, with ablations across MNIST, CIFAR-10, and CIFAR-100.',
     type: 'research',
@@ -193,7 +193,7 @@ Predictions returned as occupancy level per hour slot.
     problem:
       'VisionMamba state-space models are less studied than Vision Transformers. It is not clear whether modern optimization strategies like Sharpness-Aware Minimization, which improve ViT generalization, transfer to SSM-based architectures.',
     approach:
-      'Implemented the SAM optimizer (dual forward-backward perturbation step) within the VisionMamba training loop. Ran controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters — comparing SAM vs. AdamW baseline for each dataset and measuring Top-1 accuracy.',
+      'Implemented the SAM optimizer (dual forward-backward perturbation step) within the VisionMamba training loop. Ran controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters, comparing SAM vs. AdamW baseline for each dataset and measuring Top-1 accuracy.',
     results:
       'CIFAR-100 Top-1 improved from 71.36% to 75.13% with SAM training vs. AdamW baseline. Results suggest flat-minima optimization meaningfully improves generalization in state-space vision models.',
     content: `## Overview
@@ -261,7 +261,7 @@ SAM training provides meaningful generalization improvement for VisionMamba on C
     github: undefined,
     date: '2023-05-01',
     problem:
-      'Raw mutual-subreddit count is a poor similarity signal — it heavily favors high-activity users and ignores the semantic content of what users actually write.',
+      'Raw mutual-subreddit count is a poor similarity signal: it favors high-activity users and ignores the semantic content of what users actually write.',
     approach:
       'Pulled user activity via the Reddit API, computed degree-normalized Jaccard overlap on subreddit membership, and separately embedded each user\'s recent comment history with the OpenAI embeddings API. Blended both signals into a combined score. Flask serves the backend; React renders ranked results.',
     results:

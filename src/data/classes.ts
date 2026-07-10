@@ -110,7 +110,7 @@ export const classes: ClassItem[] = [
     ],
   },
   {
-    code: 'CS 395',
+    code: 'CS 474',
     title: 'Probabilistic Graphical Models',
     institution: 'Northwestern University',
     description:

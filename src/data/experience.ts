@@ -7,11 +7,11 @@ export const experience: Experience[] = [
     company: 'Northern Trust',
     role: 'Software Engineer',
     location: 'Chicago, IL',
-    period: '2024 – Present',
+    period: 'July 2025 – March 2026',
     description:
       'Building internal data tools and Snowflake infrastructure for the Asset Management technology group.',
     highlights: [
-      'Built two Snowflake Streamlit apps — one for client onboarding workflows and one for managing data-refresh settings',
+      'Built two Snowflake Streamlit apps: one for client onboarding and one for managing data-refresh settings',
       'Added input validation and quality checks to prevent bad data from being saved across both apps',
       'Implemented recent-activity views and 300-second query result caching to speed up troubleshooting',
     ],
@@ -31,7 +31,7 @@ export const experience: Experience[] = [
     company: 'Northwestern University',
     role: 'Research Assistant',
     location: 'Evanston, IL',
-    period: '2023 – 2024',
+    period: 'Oct 2024 – Dec 2024',
     description:
       'ML research studying the effect of Sharpness-Aware Minimization on state-space vision models.',
     highlights: [
@@ -56,7 +56,7 @@ export const experience: Experience[] = [
     company: 'Northern Trust',
     role: 'Software Engineering Intern',
     location: 'Chicago, IL',
-    period: 'Summer 2023',
+    period: 'June 2024 – Aug 2024',
     description:
       'Interned on the data engineering team, building notification infrastructure and Snowflake data pipelines.',
     highlights: [
@@ -80,7 +80,7 @@ export const experience: Experience[] = [
     company: 'Northwestern University',
     role: 'Undergraduate Teaching Assistant',
     location: 'Evanston, IL',
-    period: '2022 – 2023',
+    period: 'Mar 2024 – June 2024',
     description:
       'TA for undergraduate CS courses, supporting students through office hours and written channels.',
     highlights: [

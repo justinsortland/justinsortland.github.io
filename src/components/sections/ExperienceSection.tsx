@@ -24,7 +24,7 @@ export async function ExperienceSection() {
         <div className="mb-12">
           <h2 className="section-title">Experience</h2>
           <p className="section-subtitle mb-0">
-            Where I've built production systems and conducted applied research
+            Work history and research positions
           </p>
         </div>
 

@@ -22,7 +22,7 @@ const TRACKS = [
     headerBg: 'bg-amber/5',
     badgeClass: 'bg-amber/10 text-amber border-amber/30',
     dotClass: 'bg-amber',
-    codes: ['CS 349', 'CS 496', 'CS 395'],
+    codes: ['CS 349', 'CS 496', 'CS 474'],
   },
   {
     id: 'theory',
@@ -81,7 +81,7 @@ export function ClassesSection() {
         <div className="mb-12">
           <h2 className="section-title">Coursework</h2>
           <p className="section-subtitle mb-0">
-            Northwestern University — academic foundations in systems, ML, and theory
+            Northwestern University. Academic foundations in systems, ML, and theory
           </p>
         </div>
 
