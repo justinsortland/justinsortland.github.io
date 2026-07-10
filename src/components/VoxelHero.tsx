@@ -183,10 +183,10 @@ export function VoxelHero() {
                   </div>
                 </div>
 
-                {/* Proximity prompt — hidden while a panel is open */}
+                {/* Proximity prompt — top-center so it never overlaps the bottom-left controls */}
                 <div
-                  className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-10 transition-all duration-300
-                    ${nearBuilding && !activePanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+                  className={`absolute top-3 left-1/2 -translate-x-1/2 z-10 transition-all duration-300
+                    ${nearBuilding && !activePanel ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
                 >
                   {nearBuilding && (
                     <button
