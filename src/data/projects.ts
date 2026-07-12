@@ -68,23 +68,39 @@ Submission fields + artifact metadata
    Dashboard, detail, compare, and report views
 \`\`\`
 
-**Stack:** Next.js App Router, TypeScript, Prisma, Supabase Auth, Supabase Storage, Anthropic Claude, PostgreSQL, Tailwind CSS.
+**Stack**
 
-The review flow does not extract text from uploaded files or perform OCR. Labeled artifact metadata (document type, filename, and reviewer-supplied context) combined with submission fields and a reviewer profile are assembled into a structured prompt. Claude returns JSON with a verdict, summary, issues with severity ratings, and a list of missing or incomplete documents.
+\`Next.js App Router\` \`TypeScript\` \`Prisma\` \`Supabase Auth\` \`Supabase Storage\` \`Anthropic Claude\` \`PostgreSQL\` \`Tailwind CSS\`
+
+The review flow does not extract text from uploaded files or perform OCR.
+
+Labeled artifact metadata (document type, filename, and reviewer-supplied context), submission fields, and a reviewer profile are assembled into a structured prompt.
+
+Claude returns JSON with a verdict, summary, issues with severity ratings (critical, major, minor), and a list of missing or incomplete documents.
 
 Reviews are persisted as snapshots so past revisions remain immutable and comparable regardless of how the submission changes afterward.
 
 ## Hard Parts
 
-**Structured output and validation.** Getting Claude to return consistent JSON across diverse submissions required careful prompt engineering and server-side validation of the response shape before any database write.
+### Structured output and validation
 
-**Stable revision comparison.** The compare view matches issues across revisions even when Claude phrases the same finding differently between requests. The current approach uses field-level matching on structured fields rather than string diffing.
+Getting Claude to return consistent JSON across diverse submissions required careful prompt engineering and server-side validation of the response shape before any database write.
 
-**Immutable revision snapshots.** Each review captures a snapshot of all inputs at request time, so compare and report views always reflect what was actually reviewed, not the current state of the submission.
+### Stable revision comparison
 
-**Document coverage without text extraction.** Document coverage is inferred from labeled artifact metadata, not file contents. This keeps the implementation honest about what Claude actually sees while still letting the prompt convey which document types are present or missing.
+The compare view matches issues across revisions even when Claude phrases the same finding differently between requests. The current approach uses field-level matching on structured fields rather than string diffing.
 
-**Full-stack deployment coordination.** Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deploys, and Anthropic API keys across local and production environments required careful environment management and a clear seed script to establish demo state.
+### Immutable revision snapshots
+
+Each review captures a snapshot of all inputs at request time, so compare and report views always reflect what was actually reviewed, not the current state of the submission.
+
+### Document coverage without text extraction
+
+Document coverage is inferred from labeled artifact metadata, not file contents. This keeps the implementation honest about what Claude actually sees while still letting the prompt convey which document types are present or missing.
+
+### Full-stack deployment coordination
+
+Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deploys, and Anthropic API keys across local and production environments required careful environment management and a clear seed script to establish demo state.
 
 ## What I Would Improve Next
 
