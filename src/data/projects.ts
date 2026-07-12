@@ -6,7 +6,7 @@ export const projects: Project[] = [
     slug: 'counterparty',
     title: 'Counterparty',
     description:
-      'Full-stack applied-AI product for permit and document review. Reviewers upload documents, Claude classifies every issue by severity and generates structured feedback, and the app tracks revision history across submissions with side-by-side comparison and printable reports.',
+      'AI-assisted permit review workflow for residential construction. Users create permit submissions, attach labeled document artifacts, request structured Claude reviews, track issue severity and missing documents, compare review revisions, and generate printable reports.',
     type: 'engineering',
     featured: true,
     priority: 1,
@@ -15,68 +15,90 @@ export const projects: Project[] = [
       'Next.js',
       'TypeScript',
       'Prisma',
-      'Supabase',
+      'Supabase Auth',
+      'Supabase Storage',
       'Claude / Anthropic',
       'PostgreSQL',
       'Tailwind CSS',
     ],
     tags: ['Applied AI', 'Full-Stack', 'Document Review', 'Workflow'],
     highlights: [
-      'Claude API extracts every issue from an uploaded document and classifies it as critical, major, or minor, giving reviewers a structured checklist instead of unstructured annotations',
-      'Side-by-side view shows the original document alongside AI-generated feedback; revision history tracks how each issue changes across resubmissions',
-      'Printable reports render the full severity-graded review as a clean, shareable document in one click',
+      'Claude reviews project details, reviewer context, and labeled artifact metadata to return structured findings, severity ratings, missing documents, and verdicts.',
+      'Revision history tracks how findings change across review requests, with a compare view for resolved, persistent, and newly introduced issues.',
+      'Printable reports turn each review revision into a clean, shareable summary for discussion or follow-up.',
     ],
     github: undefined,
     date: '2026-01-01',
     dateDisplay: '2026',
     problem:
-      'Permit and document review is manual and inconsistent: reviewers work from unstructured PDFs with no shared rubric, no audit trail, and no way to see how a document changed between resubmissions.',
+      'Residential permit submissions are document-heavy and opaque. Homeowners and small contractors often cannot sanity-check a submission before it reaches a reviewer. On the reviewer side, findings are applied inconsistently with no shared rubric, no audit trail, and no structured way to see how a submission changed between review cycles.',
+    approach:
+      'Users create a permit submission, attach labeled document artifacts, and request a Claude review. The review prompt includes submission fields, labeled artifact metadata, a reviewer profile, and document coverage. Claude returns structured JSON with a verdict, summary, issues by severity, and missing documents. Reviews are persisted as snapshots. A compare view tracks how findings change across revisions. A printable report summarizes each review revision.',
     results:
-      'Structured, severity-graded reviews with full revision history, side-by-side comparison, and exportable reports. Turns an unstructured annotation process into an auditable, repeatable workflow.',
-    content: `## Overview
+      'Structured reviews with severity ratings, missing document tracking, and full revision history. A compare view surfaces resolved, persistent, and newly introduced issues across revisions. Printable reports make each review revision shareable in one click.',
+    content: `## Product Walkthrough
 
-Counterparty is a full-stack applied-AI platform for permit and document review. Reviewers upload documents, the app passes them through the Claude API for structured analysis, and results are organized by issue severity with full revision history.
+The seeded demo includes a complete permit review flow for 1847 Castro St, a sample ADU submission:
 
-## Problem
+- Dashboard with submissions, status, and recent review activity
+- Submission detail showing labeled artifact list and review history
+- Compare view for two review revisions, with resolved, persistent, and newly introduced issues
+- Printable report for a completed review revision
+- Review templates for common permit types
 
-Manual document review is inconsistent — different reviewers apply different standards, there is no shared rubric, and tracking changes across revisions requires comparing PDFs by hand. There is no audit trail.
+Screenshots and a full walkthrough are in the demo video linked below.
 
-## Architecture
+## Technical Implementation
 
 \`\`\`
-Upload (PDF / text)
+Submission fields + artifact metadata
         │
-   Next.js API Route
+   Next.js server actions
         │
-   Claude API (Anthropic)
-   ├── Issue extraction
-   ├── Severity classification (critical / major / minor)
-   └── Structured JSON response
+   Review profile + document coverage
         │
-   Prisma ORM → Supabase (PostgreSQL)
-   ├── Document versions
-   ├── Issue records
-   └── Revision history
+   Claude structured JSON review
+   ├── Verdict
+   ├── Summary
+   ├── Issues (severity: critical / major / minor)
+   └── Missing documents
         │
-   Next.js Frontend
-   ├── Side-by-side comparison view
-   ├── Revision timeline
-   └── Printable report export
+   Prisma transaction to Supabase Postgres
+        │
+   Dashboard, detail, compare, and report views
 \`\`\`
 
-## Key Engineering Decisions
+**Stack:** Next.js App Router, TypeScript, Prisma, Supabase Auth, Supabase Storage, Anthropic Claude, PostgreSQL, Tailwind CSS.
 
-- **Claude API for extraction** — structured output prompting produces consistent severity labels without fine-tuning
-- **Prisma + Supabase** — type-safe ORM with hosted Postgres; revision history is modeled as a linked list of document snapshots
-- **Side-by-side UI** — reviewers see original document and AI feedback in adjacent panels with synchronized scrolling
-- **Printable reports** — CSS print stylesheet renders the review as a clean, shareable document
+The review flow does not extract text from uploaded files or perform OCR. Labeled artifact metadata (document type, filename, and reviewer-supplied context) combined with submission fields and a reviewer profile are assembled into a structured prompt. Claude returns JSON with a verdict, summary, issues with severity ratings, and a list of missing or incomplete documents.
 
-## Features
+Reviews are persisted as snapshots so past revisions remain immutable and comparable regardless of how the submission changes afterward.
 
-- Issue severity classification: critical / major / minor
-- Full revision history with diff tracking across submissions
-- Side-by-side document and feedback comparison
-- Printable, exportable reports
+## Hard Parts
+
+**Structured output and validation.** Getting Claude to return consistent JSON across diverse submissions required careful prompt engineering and server-side validation of the response shape before any database write.
+
+**Stable revision comparison.** The compare view matches issues across revisions even when Claude phrases the same finding differently between requests. The current approach uses field-level matching on structured fields rather than string diffing.
+
+**Immutable revision snapshots.** Each review captures a snapshot of all inputs at request time, so compare and report views always reflect what was actually reviewed, not the current state of the submission.
+
+**Document coverage without text extraction.** Document coverage is inferred from labeled artifact metadata, not file contents. This keeps the implementation honest about what Claude actually sees while still letting the prompt convey which document types are present or missing.
+
+**Full-stack deployment coordination.** Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deploys, and Anthropic API keys across local and production environments required careful environment management and a clear seed script to establish demo state.
+
+## What I Would Improve Next
+
+- OCR and document text extraction, so Claude can review actual file content rather than metadata
+- A jurisdiction or building code database to ground issue findings in specific regulations
+- Team workspaces and reviewer assignment for multi-reviewer flows
+- Rate limiting or invite gating before opening a public demo
+- Stronger response validation and retry handling for Claude API calls
+
+## Links
+
+- **Demo video:** [Watch on YouTube](https://youtu.be/-JJuIGjXw1Y)
+- **GitHub:** source code, README, and technical writeup
+- **Live demo:** available on request
 `,
   },
 
