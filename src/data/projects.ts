@@ -36,7 +36,13 @@ export const projects: Project[] = [
       'Users create a permit submission, attach labeled document artifacts, and request a Claude review. The review prompt includes submission fields, labeled artifact metadata, a reviewer profile, and document coverage. Claude returns structured JSON with a verdict, summary, issues by severity, and missing documents. Reviews are persisted as snapshots. A compare view tracks how findings change across revisions. A printable report summarizes each review revision.',
     results:
       'Structured reviews with severity ratings, missing document tracking, and full revision history. A compare view surfaces resolved, persistent, and newly introduced issues across revisions. Printable reports make each review revision shareable in one click.',
-    content: `## Product Walkthrough
+    content: `## Links
+
+- **GitHub:** [github.com/justinsortland/counterparty](https://github.com/justinsortland/counterparty) — source code, README, and technical writeup
+- **Demo video:** [Watch on YouTube](https://youtu.be/-JJuIGjXw1Y) — full product walkthrough
+- **Live demo:** available on request
+
+## Product Walkthrough
 
 The seeded demo includes a complete permit review flow for 1847 Castro St, a sample ADU submission:
 
@@ -46,7 +52,7 @@ The seeded demo includes a complete permit review flow for 1847 Castro St, a sam
 - Printable report for a completed review revision
 - Review templates for common permit types
 
-Screenshots and a full walkthrough are in the demo video linked below.
+Screenshots and a full walkthrough are in the demo video linked above.
 
 ## Technical Implementation
 
@@ -110,11 +116,6 @@ Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deplo
 - Rate limiting or invite gating before opening a public demo
 - Stronger response validation and retry handling for Claude API calls
 
-## Links
-
-- **Demo video:** [Watch on YouTube](https://youtu.be/-JJuIGjXw1Y)
-- **GitHub:** [github.com/justinsortland/counterparty](https://github.com/justinsortland/counterparty) (source code, README, and technical writeup)
-- **Live demo:** available on request
 `,
   },
 
