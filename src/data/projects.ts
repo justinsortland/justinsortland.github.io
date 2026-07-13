@@ -27,7 +27,7 @@ export const projects: Project[] = [
       'Revision history tracks how findings change across review requests, with a compare view for resolved, persistent, and newly introduced issues.',
       'Printable reports turn each review revision into a clean, shareable summary for discussion or follow-up.',
     ],
-    github: undefined,
+    github: 'https://github.com/justinsortland/counterparty',
     date: '2026-01-01',
     dateDisplay: '2026',
     problem:
@@ -113,7 +113,7 @@ Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deplo
 ## Links
 
 - **Demo video:** [Watch on YouTube](https://youtu.be/-JJuIGjXw1Y)
-- **GitHub:** source code, README, and technical writeup
+- **GitHub:** [github.com/justinsortland/counterparty](https://github.com/justinsortland/counterparty) (source code, README, and technical writeup)
 - **Live demo:** available on request
 `,
   },
