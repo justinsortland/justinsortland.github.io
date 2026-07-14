@@ -42,101 +42,92 @@ export default async function BlogPage() {
           </a>
         </div>
 
-        {/* Featured posts */}
-        {featuredPosts.length > 0 && (
-          <div className="mb-12">
-            <h2 className="font-display text-xl font-semibold text-graph-100 mb-6">Featured</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {featuredPosts.slice(0, 2).map(post => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="glass-card-hover p-6"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`tag ${post.type === 'reading' ? 'tag-violet' : 'tag-accent'}`}>
-                      {post.type === 'reading' ? '📚 Book' : '🧪 Learning'}
-                    </span>
-                    <span className="text-sm text-graph-500">{post.date}</span>
-                  </div>
-                  <h3 className="font-display text-xl font-semibold text-graph-100 mb-2 group-hover:text-accent transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-graph-400 text-sm mb-4 line-clamp-2">{post.excerpt}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.slice(0, 3).map(tag => (
-                      <span key={tag} className="tag text-2xs">{tag}</span>
-                    ))}
-                  </div>
-                </Link>
-              ))}
-            </div>
+        {posts.length === 0 ? (
+          <div className="glass-card p-10 text-center">
+            <p className="text-graph-400 text-sm">No posts yet.</p>
           </div>
-        )}
-
-        <div className="grid lg:grid-cols-3 gap-12">
-          {/* Posts list */}
-          <div className="lg:col-span-2">
-            <h2 className="font-display text-xl font-semibold text-graph-100 mb-6">Recent Posts</h2>
-            <div className="space-y-6">
-              {recentPosts.map(post => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="block glass-card p-6 hover:border-accent/30 transition-all"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`tag text-2xs ${post.type === 'reading' ? 'tag-violet' : 'tag-accent'}`}>
-                      {post.type === 'reading' ? 'Book' : 'Learning'}
-                    </span>
-                    <span className="text-sm text-graph-500">{post.date}</span>
-                  </div>
-                  <h3 className="font-display text-lg font-semibold text-graph-100 mb-2 hover:text-accent transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-graph-400 text-sm line-clamp-2">{post.excerpt}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <aside className="space-y-8">
-            {/* Tags */}
-            <div className="glass-card p-6">
-              <h3 className="font-display font-semibold text-graph-100 mb-4">Topics</h3>
-              <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
-                  <Link
-                    key={tag}
-                    href={`/blog/tag/${tag.toLowerCase()}`}
-                    className="tag-interactive"
-                  >
-                    {tag}
-                  </Link>
-                ))}
+        ) : (
+          <>
+            {/* Featured posts */}
+            {featuredPosts.length > 0 && (
+              <div className="mb-12">
+                <h2 className="font-display text-xl font-semibold text-graph-100 mb-6">Featured</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {featuredPosts.slice(0, 2).map(post => (
+                    <Link
+                      key={post.slug}
+                      href={`/blog/${post.slug}`}
+                      className="glass-card-hover p-6"
+                    >
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`tag ${post.type === 'reading' ? 'tag-violet' : 'tag-accent'}`}>
+                          {post.type === 'reading' ? '📚 Book' : '🧪 Learning'}
+                        </span>
+                        <span className="text-sm text-graph-500">{post.date}</span>
+                      </div>
+                      <h3 className="font-display text-xl font-semibold text-graph-100 mb-2 group-hover:text-accent transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-graph-400 text-sm mb-4 line-clamp-2">{post.excerpt}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {post.tags.slice(0, 3).map(tag => (
+                          <span key={tag} className="tag text-2xs">{tag}</span>
+                        ))}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Newsletter */}
-            <div className="glass-card p-6">
-              <h3 className="font-display font-semibold text-graph-100 mb-2">Stay Updated</h3>
-              <p className="text-sm text-graph-400 mb-4">
-                Get notified when I publish new posts about ML and graphs.
-              </p>
-              <form className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="input text-sm"
-                />
-                <button type="submit" className="btn-primary w-full text-sm">
-                  Subscribe
-                </button>
-              </form>
+            <div className="grid lg:grid-cols-3 gap-12">
+              {/* Posts list */}
+              <div className="lg:col-span-2">
+                <h2 className="font-display text-xl font-semibold text-graph-100 mb-6">Recent Posts</h2>
+                <div className="space-y-6">
+                  {recentPosts.map(post => (
+                    <Link
+                      key={post.slug}
+                      href={`/blog/${post.slug}`}
+                      className="block glass-card p-6 hover:border-accent/30 transition-all"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`tag text-2xs ${post.type === 'reading' ? 'tag-violet' : 'tag-accent'}`}>
+                          {post.type === 'reading' ? 'Book' : 'Learning'}
+                        </span>
+                        <span className="text-sm text-graph-500">{post.date}</span>
+                      </div>
+                      <h3 className="font-display text-lg font-semibold text-graph-100 mb-2 hover:text-accent transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-graph-400 text-sm line-clamp-2">{post.excerpt}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              {tags.length > 0 && (
+                <aside>
+                  <div className="glass-card p-6">
+                    <h3 className="font-display font-semibold text-graph-100 mb-4">Topics</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map(tag => (
+                        <Link
+                          key={tag}
+                          href={`/blog/tag/${tag.toLowerCase()}`}
+                          className="tag-interactive"
+                        >
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </aside>
+              )}
             </div>
-          </aside>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

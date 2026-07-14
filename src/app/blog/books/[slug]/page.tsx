@@ -5,6 +5,10 @@ import type { Metadata } from 'next';
 
 export async function generateStaticParams() {
   const books = await getReadings();
+  // Next.js 14 output: export requires at least one path for dynamic routes.
+  // Return a sentinel when there are no books; the page will call notFound()
+  // for any unrecognized slug, so the sentinel path is unreachable in practice.
+  if (books.length === 0) return [{ slug: '_empty' }];
   return books.map((b) => ({ slug: b.slug }));
 }
 

@@ -29,47 +29,53 @@ export default async function LearningPage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {posts.map(post => (
-            <Link
-              key={post.slug}
-              href={`/blog/learning/${post.slug}`}
-              className="block glass-card p-6 hover:border-accent/30 transition-all"
-            >
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm text-graph-500">{post.date}</span>
-                    <span className={`tag text-2xs ${difficultyColors[post.difficulty]}`}>
-                      {post.difficulty}
-                    </span>
+        {posts.length === 0 ? (
+          <div className="glass-card p-10 text-center">
+            <p className="text-graph-400 text-sm">No posts yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {posts.map(post => (
+              <Link
+                key={post.slug}
+                href={`/blog/learning/${post.slug}`}
+                className="block glass-card p-6 hover:border-accent/30 transition-all"
+              >
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-sm text-graph-500">{post.date}</span>
+                      <span className={`tag text-2xs ${difficultyColors[post.difficulty]}`}>
+                        {post.difficulty}
+                      </span>
+                    </div>
+                    <h2 className="font-display text-xl font-semibold text-graph-100 hover:text-accent transition-colors">
+                      {post.title}
+                    </h2>
                   </div>
-                  <h2 className="font-display text-xl font-semibold text-graph-100 hover:text-accent transition-colors">
-                    {post.title}
-                  </h2>
+                  {post.featured && (
+                    <span className="tag tag-amber shrink-0">Featured</span>
+                  )}
                 </div>
-                {post.featured && (
-                  <span className="tag tag-amber shrink-0">Featured</span>
+
+                <p className="text-graph-400 mb-4 line-clamp-2">{post.content.slice(0, 200)}...</p>
+
+                {post.prerequisites && post.prerequisites.length > 0 && (
+                  <div className="mb-4">
+                    <span className="text-sm text-graph-500">Prerequisites: </span>
+                    <span className="text-sm text-graph-400">{post.prerequisites.join(', ')}</span>
+                  </div>
                 )}
-              </div>
-              
-              <p className="text-graph-400 mb-4 line-clamp-2">{post.content.slice(0, 200)}...</p>
 
-              {post.prerequisites && post.prerequisites.length > 0 && (
-                <div className="mb-4">
-                  <span className="text-sm text-graph-500">Prerequisites: </span>
-                  <span className="text-sm text-graph-400">{post.prerequisites.join(', ')}</span>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map(tag => (
+                    <span key={tag} className="tag text-2xs">{tag}</span>
+                  ))}
                 </div>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
-                  <span key={tag} className="tag text-2xs">{tag}</span>
-                ))}
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
