@@ -227,7 +227,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
     sections: [
       {
         heading: "Let's Connect",
-        body: "I'm open to new opportunities in software engineering and ML. Whether it's about a role, a project, or just to chat — I'd love to hear from you.",
+        body: "I'm open to new opportunities in software engineering and ML. Whether it's about a role, a project, or just to chat, I'd love to hear from you.",
       },
       {
         heading: 'Find Me At',
