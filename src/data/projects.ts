@@ -206,9 +206,9 @@ Predictions returned as occupancy level per hour slot.
   // ─── ML Research ─────────────────────────────────────────────────────────────
   {
     slug: 'sam-visionmamba',
-    title: 'SAM + VisionMamba: Sharpness-Aware Training',
+    title: 'Evaluating Sharpness-Aware Minimization on VisionMamba',
     description:
-      'ML research integrating Sharpness-Aware Minimization (SAM optimizer) into the VisionMamba state-space architecture, with ablations across MNIST, CIFAR-10, and CIFAR-100.',
+      'A training comparison of SAM-wrapped AdamW against a standard AdamW baseline on VisionMamba-tiny across MNIST, CIFAR-10, and CIFAR-100.',
     type: 'research',
     featured: true,
     priority: 3,
@@ -224,62 +224,86 @@ Predictions returned as occupancy level per hour slot.
     ],
     tags: ['ML Research', 'Optimization', 'State Space Models', 'Vision'],
     highlights: [
-      'Integrated the SAM optimizer (Sharpness-Aware Minimization) into the VisionMamba training pipeline as a drop-in replacement for AdamW',
-      'Ablations across MNIST, CIFAR-10, and CIFAR-100 isolating the effect of flat-minima bias on state-space model generalization',
-      'CIFAR-100 Top-1 accuracy improved from 71.36% to 75.13% with SAM training vs. baseline AdamW',
+      'Modified the VisionMamba training pipeline to support SAM\'s two-step optimizer update pattern across sam.py, main.py, and engine.py',
+      'Ran six model runs across MNIST, CIFAR-10, and CIFAR-100 comparing SAM-wrapped AdamW against a standard AdamW baseline',
+      'CIFAR-100 top-1 accuracy improved from 71.36% to 75.13% with SAM; benefit was absent on simpler datasets',
     ],
     github: undefined,
     paper: undefined,
     date: '2024-10-01',
     dateDisplay: 'Oct 2024 – Dec 2024',
     problem:
-      'VisionMamba state-space models are less studied than Vision Transformers. It is not clear whether modern optimization strategies like Sharpness-Aware Minimization, which improve ViT generalization, transfer to SSM-based architectures.',
+      'VisionMamba applies state-space modeling to image classification. SAM is an optimizer designed to favor flatter loss regions and has shown generalization improvements for Vision Transformers, but it was not clear whether those gains would carry over to an SSM-based architecture or whether they would depend on task difficulty.',
     approach:
-      'Implemented the SAM optimizer (dual forward-backward perturbation step) within the VisionMamba training loop. Ran controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters, comparing SAM vs. AdamW baseline for each dataset and measuring Top-1 accuracy.',
+      'Trained VisionMamba-tiny with two optimizer setups, AdamW baseline and SAM wrapped around AdamW, holding all other hyperparameters fixed. Tracked top-1 accuracy, top-5 accuracy, training loss, and testing loss across six runs on MNIST, CIFAR-10, and CIFAR-100.',
     results:
-      'CIFAR-100 Top-1 improved from 71.36% to 75.13% with SAM training vs. AdamW baseline. Results suggest flat-minima optimization meaningfully improves generalization in state-space vision models.',
-    content: `## Overview
+      'SAM had the clearest benefit on CIFAR-100, improving top-1 accuracy from 71.36% to 75.13% (+3.77 pp). On CIFAR-10, accuracy decreased slightly. Training loss stayed slightly higher with SAM while test loss was lower on CIFAR-100, suggesting that SAM improved held-out performance despite maintaining slightly higher training loss.',
+    content: `## Implementation
 
-This project studies whether Sharpness-Aware Minimization (SAM) — an optimizer that explicitly seeks flat loss minima — improves generalization in VisionMamba, a state-space model (SSM) architecture for vision tasks.
+I made three targeted changes to the VisionMamba codebase.
 
-## Background
+**\`sam.py\`** implements the SAM optimizer class. SAM requires two forward-backward passes per parameter update. The first pass computes the gradient, then SAM perturbs the weights toward a sharper region of the loss surface. The second pass computes the gradient at the perturbed weights, which is used for the actual update.
 
-**VisionMamba** applies selective state-space models (Mamba) to image patches, replacing attention with a linear-complexity recurrent scan. It generalizes well but has been less studied than Vision Transformers with respect to optimization strategy.
+**\`main.py\`** was modified to accept a flag that switches the optimizer from standard AdamW to SAM-wrapped AdamW.
 
-**SAM optimizer** adds a perturbation step that finds weights lying in flat regions of the loss landscape, which tend to generalize better. It has been shown to improve ViT performance but its effect on SSM-based models is understudied.
+**\`engine.py\`** was updated to handle SAM's two-step update pattern. The standard single \`optimizer.step()\` call was replaced with a \`first_step\` and \`second_step\` sequence that runs the perturbation, second gradient computation, weight restoration, and final update in the correct order.
 
-## Method
+Datasets were prepared in the ImageNet-style directory format expected by the training script, with separate \`train/\` and \`val/\` directories per class.
 
-SAM adds a two-step gradient update:
+## Experiment Design
 
-\`\`\`
-# Step 1: compute perturbation
-ε̂ = ρ · ∇L(w) / ‖∇L(w)‖
+Each model trained for 30 epochs on a single GPU using the VisionMamba-tiny architecture.
 
-# Step 2: gradient at perturbed weights
-g = ∇L(w + ε̂)
+| Setting | Value |
+|---|---|
+| Architecture | VisionMamba-tiny |
+| Epochs | 30 |
+| Batch size | 128 |
+| Learning rate | 5e-6 |
+| Weight decay | near zero |
+| Stochastic depth | disabled |
+| Mixed precision | disabled |
 
-# Step 3: update with base optimizer
-w ← w − η · g
-\`\`\`
+Training without SAM took roughly 14 to 16 minutes per epoch, or about 7 hours per model. Training with SAM took roughly 25 to 30 minutes per epoch, or about 14 hours per model. The extra cost comes from running a second forward-backward pass on every step.
 
-Integrated into VisionMamba as a wrapper around the optimizer step, with ρ=0.05 (perturbation radius).
+## Results
 
-## Ablations
+SAM had the clearest benefit on CIFAR-100.
 
-Controlled experiments across three benchmarks with matched hyperparameters (batch size, lr, epochs):
-
-| Dataset | AdamW (baseline) | SAM | Δ Top-1 |
+| Dataset | AdamW Top-1 | SAM Top-1 | Change |
 |---|---|---|---|
-| MNIST | — | — | — |
-| CIFAR-10 | — | — | — |
-| CIFAR-100 | 71.36% | 75.13% | **+3.77%** |
+| CIFAR-10 | 97.37% | 97.05% | -0.32 pp |
+| CIFAR-100 | 71.36% | 75.13% | +3.77 pp |
 
-CIFAR-100 showed the clearest improvement, consistent with SAM's known benefit on more complex distributions.
+An additional logged row is excluded because the source table labels the dataset as "MAMBA," while the experiment setup describes MNIST, CIFAR-10, and CIFAR-100. I would verify the original logs before citing that result.
 
-## Conclusion
+On CIFAR-100, training loss stayed slightly higher with SAM while test loss was lower, suggesting that SAM improved held-out performance despite maintaining slightly higher training loss. On CIFAR-10, SAM did not help and accuracy dropped slightly.
 
-SAM training provides meaningful generalization improvement for VisionMamba on CIFAR-100 (+3.77% Top-1). This suggests flat-minima optimization is not ViT-specific and transfers to SSM-based vision architectures.
+## What I Learned
+
+The main takeaway is that optimizer choice should be evaluated against task difficulty. SAM added roughly double the training time but the improvement only appeared on the hardest dataset. On CIFAR-10 and MNIST the extra cost was not justified.
+
+Integrating SAM into an existing training loop requires care. The two-step update is not a drop-in replacement for a single \`optimizer.step()\` call. The perturbation, second gradient computation, weight restore, and final update each need to happen in the right sequence, and gradient zeroing has to be handled correctly between steps.
+
+## Limitations
+
+This was a course research project. Each configuration used a single run, so there is no variance estimate across seeds. Thirty epochs is a short schedule for CIFAR-100. The baseline hyperparameters were fixed rather than separately tuned, so a stronger AdamW configuration could narrow the CIFAR-100 gap. The MNIST result is currently unverified due to a labeling inconsistency in the source data.
+
+## Next Steps
+
+- Rerun with multiple seeds to get variance estimates
+- Tune the SAM perturbation radius instead of using the default
+- Train for longer on CIFAR-100 to see if the gap persists
+- Test on Tiny ImageNet to check whether the pattern holds at higher complexity
+- Compare against ASAM or other SAM variants
+
+## Resume Bullets
+
+**AI engineering:** Implemented Sharpness-Aware Minimization in the VisionMamba training pipeline and ran optimizer comparisons across MNIST, CIFAR-10, and CIFAR-100, improving CIFAR-100 top-1 accuracy by 3.77 percentage points over an AdamW baseline.
+
+**ML research engineering:** Integrated SAM into a VisionMamba-tiny training loop by adding a two-step optimizer update path across sam.py, main.py, and engine.py, and evaluated top-1 accuracy, top-5 accuracy, training loss, and testing loss across six model runs.
+
+**Software engineering:** Modified an existing PyTorch training codebase to support a configurable optimizer backend, adding SAM as a drop-in option and validating behavior through training and evaluation curves across three datasets.
 `,
   },
 
