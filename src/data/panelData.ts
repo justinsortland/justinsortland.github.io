@@ -40,7 +40,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
       {
         heading: 'Highlights',
         bullets: [
-          'Claude API extracts every issue and classifies it as critical, major, or minor — structured checklist instead of unstructured annotations',
+          'Claude API extracts every issue and classifies it as critical, major, or minor, producing a structured checklist instead of unstructured annotations',
           'Side-by-side view with synchronized scroll; revision history tracks how each issue changes across resubmissions',
           'Printable reports render the full severity-graded review as a clean, shareable document in one click',
         ],
