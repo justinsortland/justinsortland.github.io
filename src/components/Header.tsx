@@ -11,7 +11,6 @@ const navigation = [
   { name: 'Classes', href: '/#classes' },
   { name: 'Skills', href: '/#skills' },
   { name: 'Contact', href: '/#contact' },
-  { name: 'Blog', href: '/blog' },
 ];
 
 export function Header() {

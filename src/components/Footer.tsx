@@ -37,15 +37,6 @@ const footerLinks = [
     ],
   },
   {
-    title: 'Blog',
-    links: [
-      { name: 'All Posts', href: '/blog' },
-      { name: 'Readings', href: '/blog/books' },
-      { name: 'Learning', href: '/blog/learning' },
-      { name: 'RSS Feed', href: '/rss.xml' },
-    ],
-  },
-  {
     title: 'Links',
     links: [
       { name: 'GitHub', href: 'https://github.com/justinsortland' },
