@@ -87,7 +87,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
     sections: [
       {
         heading: 'SAM + VisionMamba',
-        body: 'Studied whether Sharpness-Aware Minimization (SAM optimizer) improves generalization in VisionMamba, a state-space model (SSM) architecture for vision tasks — running controlled ablations across MNIST, CIFAR-10, and CIFAR-100.',
+        body: 'Studied whether Sharpness-Aware Minimization (SAM optimizer) improves generalization in VisionMamba, a state-space model (SSM) architecture for vision tasks, running controlled ablations across MNIST, CIFAR-10, and CIFAR-100.',
       },
       {
         heading: 'Tech Stack',
@@ -98,7 +98,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
         bullets: [
           'Integrated the SAM optimizer (dual forward-backward perturbation) into the VisionMamba training pipeline as a drop-in for AdamW',
           'Controlled ablations on MNIST, CIFAR-10, and CIFAR-100 with matched hyperparameters',
-          'CIFAR-100 Top-1 improved from 71.36% to 75.13% — +3.77% over AdamW baseline',
+          'CIFAR-100 Top-1 improved from 71.36% to 75.13% (+3.77% over AdamW baseline)',
         ],
       },
     ],
@@ -167,24 +167,24 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
       {
         heading: 'Systems',
         bullets: [
-          'CS 343 — Operating Systems',
-          'CS 345 — Distributed Systems',
-          'CS 340 — Computer Networking',
+          'CS 343: Operating Systems',
+          'CS 345: Distributed Systems',
+          'CS 340: Computer Networking',
         ],
       },
       {
         heading: 'Theory & Algorithms',
         bullets: [
-          'CS 336 — Analysis of Algorithms',
-          'IEMS 315 — Stochastic Processes',
+          'CS 336: Analysis of Algorithms',
+          'IEMS 315: Stochastic Processes',
         ],
       },
       {
         heading: 'Machine Learning',
         bullets: [
-          'CS 349 — Machine Learning',
-          'CS 496 — Deep Learning',
-          'CS 395 — Probabilistic Graphical Models',
+          'CS 349: Machine Learning',
+          'CS 496: Deep Learning',
+          'CS 395: Probabilistic Graphical Models',
         ],
       },
     ],
