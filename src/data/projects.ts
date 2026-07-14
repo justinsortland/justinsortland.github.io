@@ -297,13 +297,6 @@ This was a course research project. Each configuration used a single run, so the
 - Test on Tiny ImageNet to check whether the pattern holds at higher complexity
 - Compare against ASAM or other SAM variants
 
-## Resume Bullets
-
-**AI engineering:** Implemented Sharpness-Aware Minimization in the VisionMamba training pipeline and ran optimizer comparisons across MNIST, CIFAR-10, and CIFAR-100, improving CIFAR-100 top-1 accuracy by 3.77 percentage points over an AdamW baseline.
-
-**ML research engineering:** Integrated SAM into a VisionMamba-tiny training loop by adding a two-step optimizer update path across sam.py, main.py, and engine.py, and evaluated top-1 accuracy, top-5 accuracy, training loss, and testing loss across six model runs.
-
-**Software engineering:** Modified an existing PyTorch training codebase to support a configurable optimizer backend, adding SAM as a drop-in option and validating behavior through training and evaluation curves across three datasets.
 `,
   },
 
