@@ -1,8 +1,8 @@
 const LINKS = [
   {
     label: 'Email',
-    value: 'justinsortland@u.northwestern.edu',
-    href: 'mailto:justinsortland@u.northwestern.edu',
+    value: 'justinsortland2025@u.northwestern.edu',
+    href: 'mailto:justinsortland2025@u.northwestern.edu',
     external: false,
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

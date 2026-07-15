@@ -41,7 +41,7 @@ const footerLinks = [
     links: [
       { name: 'GitHub', href: 'https://github.com/justinsortland' },
       { name: 'LinkedIn', href: 'https://linkedin.com/in/justinsortland' },
-      { name: 'Email', href: 'mailto:justinsortland@u.northwestern.edu' },
+      { name: 'Email', href: 'mailto:justinsortland2025@u.northwestern.edu' },
       { name: 'Resume', href: '/resume.pdf' },
     ],
   },

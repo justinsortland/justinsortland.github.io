@@ -232,7 +232,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
       {
         heading: 'Find Me At',
         bullets: [
-          'Email: justinsortland@gmail.com',
+          'Email: justinsortland2025@u.northwestern.edu',
           'GitHub: github.com/justinsortland',
           'LinkedIn: linkedin.com/in/justinsortland',
         ],
