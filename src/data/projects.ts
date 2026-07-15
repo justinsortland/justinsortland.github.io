@@ -299,74 +299,54 @@ This was a course research project. Each configuration used a single run, so the
 `,
   },
 
-  // ─── Secondary ───────────────────────────────────────────────────────────────
+  // ─── Supporting ──────────────────────────────────────────────────────────────
   {
-    slug: 'friendship-similarity',
-    title: 'Friendship Similarity Analyzer',
+    slug: 'social-me',
+    title: 'Social Me',
     description:
-      'Applied-AI tool that quantifies structural social similarity between Reddit users by combining subreddit overlap analysis with OpenAI embedding distance.',
+      'A Chrome extension prototype for comparing Reddit gaming profiles with LLM-generated interest summaries. Built as a 3-person class team project; my contribution was the Chrome extension frontend.',
     type: 'engineering',
     featured: false,
     priority: 4,
     voxelZone: 'ml-lab',
-    technologies: ['Python', 'Flask', 'React', 'Reddit API', 'OpenAI API', 'NetworkX'],
-    tags: ['Applied AI', 'Social Networks', 'NLP', 'Embeddings'],
-    highlights: [
-      'Fetches user activity via the Reddit API and computes subreddit overlap with Jaccard normalization to avoid raw-count bias',
-      'Combines structural overlap with OpenAI embedding cosine similarity on user comment history for a blended similarity score',
-      'Flask REST API + React frontend with ranked similarity output',
+    technologies: [
+      'JavaScript',
+      'HTML',
+      'CSS',
+      'Chrome Extension API',
+      'Flask',
+      'Python',
+      'PRAW',
+      'GPT-4o',
     ],
-    github: undefined,
-    date: '2024-09-01',
-    dateDisplay: 'Sep 2024 – Dec 2024',
-    problem:
-      'Raw mutual-subreddit count is a poor similarity signal: it favors high-activity users and ignores the semantic content of what users actually write.',
-    approach:
-      'Pulled user activity via the Reddit API, computed degree-normalized Jaccard overlap on subreddit membership, and separately embedded each user\'s recent comment history with the OpenAI embeddings API. Blended both signals into a combined score. Flask serves the backend; React renders ranked results.',
-    results:
-      'Combined score outperforms raw mutual-subreddit count as a similarity heuristic, particularly for users with asymmetric activity levels, by accounting for semantic content alongside structural overlap.',
+    tags: ['Applied AI', 'Browser Extension', 'Social Computing', 'Prototype'],
+    highlights: [
+      'Chrome extension detects whether the active Reddit tab is a user profile or subreddit page and adjusts the popup UI and request flow accordingly.',
+      'Backend scrapes Reddit post history via PRAW, sends it to GPT-4o to extract structured interest profiles (games, genres, non-gaming interests), and returns qualitative similarity matches.',
+      'Archived class prototype; similarity matching is LLM-delegated, not algorithmic. Not deployed beyond a local development setup.',
+    ],
+    github: 'https://github.com/sarahfazio/CS338',
+    date: '2024-10-01',
+    dateDisplay: 'Oct 2024 – Dec 2024',
     content: `## Overview
 
-A tool that computes social similarity between two Reddit users using both structural network overlap and semantic content similarity.
+Social Me was a class team project (3 people) that paired a Chrome extension with a local Flask backend to analyze Reddit gaming profiles. The extension let users trigger profile analysis directly from Reddit pages. The backend used PRAW to scrape post history, sent that data to GPT-4o to extract structured interest summaries, and compared profiles to surface qualitatively similar users.
 
-## Why Not Just Count Shared Subreddits?
+My contribution was the Chrome extension frontend: the popup UI, page-aware button behavior, response formatting, and communication with the Flask backend.
 
-Shared subreddit count is biased by activity level. A user subscribed to 500 subreddits sharing 50 with another looks the same as two users sharing 50 out of 60 — but the latter are far more structurally similar. Raw counts also ignore what users actually post about.
+## What It Does
 
-## Two Similarity Signals
+The extension detects whether the active tab is a Reddit user profile or a subreddit page and updates the UI accordingly. On a user profile, it triggers a fetch to the local backend that scrapes the user's recent posts, sends the data to GPT-4o, and returns a structured JSON profile covering gaming interests, genres, and non-gaming interests. On a subreddit, it runs the same flow across multiple users and asks GPT-4o to identify the five most similar to a reference profile.
 
-### 1. Jaccard Subreddit Overlap
-
-For users \`u\` and \`v\` with subreddit sets \`S(u)\` and \`S(v)\`:
-
-\`\`\`
-jaccard(u, v) = |S(u) ∩ S(v)| / |S(u) ∪ S(v)|
-\`\`\`
-
-Degree-normalized and bounded in [0, 1]. Pulled via Reddit API.
-
-### 2. OpenAI Embedding Similarity
-
-Recent comment history for each user is embedded via the OpenAI embeddings API, then compared with cosine similarity:
-
-\`\`\`python
-embedding_u = openai.embeddings.create(input=comments_u, model="text-embedding-3-small")
-embedding_v = openai.embeddings.create(input=comments_v, model="text-embedding-3-small")
-sim_embed = cosine_similarity(embedding_u, embedding_v)
-\`\`\`
-
-### Combined Score
-
-\`\`\`
-similarity(u, v) = 0.5 · jaccard(u, v) + 0.5 · sim_embed(u, v)
-\`\`\`
+The similarity comparison is qualitative: Reddit post data is sent to GPT-4o as context, and the model returns ranked matches based on its judgment. There is no formal similarity metric, cosine distance, or embedding computation.
 
 ## Stack
 
-- **Reddit API** — user subreddit membership and comment history
-- **OpenAI API** — text-embedding-3-small for comment embeddings
-- **Flask** — REST backend serving similarity scores
-- **React** — frontend for entering usernames and displaying ranked results
+\`Chrome Extension API\` \`JavaScript\` \`HTML\` \`CSS\` \`Flask\` \`Python\` \`PRAW\` \`GPT-4o\`
+
+## Status
+
+Archived class prototype. The backend runs locally on port 5000 and was not deployed. The repo is public under the original team owner's account.
 `,
   },
 ];
