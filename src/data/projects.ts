@@ -122,9 +122,9 @@ Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deplo
   // ─── Second Project ───────────────────────────────────────────────────────────
   {
     slug: 'spactivity',
-    title: 'SPACtivity: Gym Traffic Predictor',
+    title: 'SPACtivity: Northwestern Gym Discovery and Traffic Visualization',
     description:
-      'Full-stack mobile data product that visualizes gym occupancy patterns and predicts traffic using time-series models, helping users plan visits around peak hours.',
+      'A Flutter mobile app prototype for checking Northwestern gym traffic, facilities, equipment, and hours.',
     type: 'engineering',
     featured: true,
     priority: 2,
@@ -132,74 +132,73 @@ Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deplo
     technologies: [
       'Flutter',
       'Dart',
-      'AWS Lambda',
-      'AWS S3',
-      'AWS RDS',
-      'PostgreSQL',
-      'REST APIs',
+      'Provider',
+      'Google Maps',
+      'FL Chart',
       'Python',
     ],
-    tags: ['Mobile', 'Full-Stack', 'Data', 'Time-Series'],
+    tags: ['Mobile', 'Flutter', 'Data Visualization', 'Prototype'],
     highlights: [
-      'Time-series occupancy model trained on historical gym entry data, served via AWS Lambda REST API',
-      'Flutter mobile app with interactive traffic visualization showing predicted vs. historical occupancy across the day',
-      'AWS RDS (PostgreSQL) stores entry data; Lambda serves predictions on-demand; S3 hosts static model artifacts',
+      'Flutter app with gym discovery, traffic visualization, equipment browsing, favorites, dark mode, and map directions in one interface',
+      'Traffic charts used live Northwestern gym data where available, supplemented by estimated fallback values when historical coverage was sparse',
+      'Provider-managed state across gym, facility, equipment, favorites, and theme layers with reusable screen and model architecture',
     ],
     github: undefined,
     date: '2023-06-01',
-    dateDisplay: 'Jun 2023 – Sep 2024',
+    dateDisplay: '2023',
     problem:
-      'Gym-goers at Northwestern\'s SPAC facility had no way to know how crowded it would be before arriving. Without occupancy data, planning a visit around peak hours required guesswork.',
+      'Northwestern students often choose between multiple gyms without a clean view of current conditions or facility details. A student might care about whether a gym is crowded, whether it has the right equipment, whether it is open, or how far away it is.',
     approach:
-      'Collected gym entry data and stored it in AWS RDS (PostgreSQL). Built a Python time-series model to predict occupancy by hour-of-day and day-of-week, packaged it as a Lambda function, and exposed it via REST API. Built a Flutter mobile app that fetches predictions and visualizes traffic curves.',
+      'Built a Flutter app with structured pages for gyms, facilities, equipment, favorites, settings, and search. Traffic visualization used live gym data where available and estimated fallback values when coverage was sparse. Provider handled state for gyms, equipment, facilities, favorites, and theme settings.',
     results:
-      'Users see predicted occupancy by time of day, compare against historical patterns, and pick when to go.',
+      'A working mobile prototype connecting a real campus use case to a structured Flutter application, covering gym discovery, traffic visualization, equipment browsing, maps, favorites, and dark mode.',
     content: `## Overview
 
-SPACtivity is a full-stack mobile app that predicts and visualizes gym traffic at Northwestern's SPAC facility, letting users pick a time to go before it gets crowded.
+SPACtivity was a mobile app prototype I built for Northwestern students who wanted a faster way to decide which gym to use. The app combined gym discovery, facility details, equipment information, maps, favorites, dark mode, and traffic visualization in one Flutter interface.
 
-## Architecture
+The project was designed around a real student problem: Northwestern has multiple recreation facilities, but deciding where to go can depend on crowding, equipment availability, location, and hours. SPACtivity turned that information into a mobile-first experience that made gym choice easier.
 
-\`\`\`
-Entry Data (historical)
-        │
-   AWS RDS (PostgreSQL)
-        │
-   Python Model (time-series)
-        │
-   AWS Lambda → REST API
-        │
-   Flutter Mobile App
-   ├── Traffic visualization (chart)
-   └── Prediction display (by time slot)
-        │
-   AWS S3 (model artifacts)
-\`\`\`
+## Problem
 
-## Model
+Northwestern students often choose between multiple gyms without a clean view of current conditions or facility details. A student might care about whether a gym is crowded, whether it has the right equipment, whether it is open, or how far away it is.
 
-Time-series occupancy model trained on historical entry counts, with features:
+I wanted to build an app that treated gym choice as a product problem rather than a static information page. The goal was to make recreation data easier to browse, compare, and act on from a phone.
 
-- Hour of day (0–23)
-- Day of week (0=Mon … 6=Sun)
-- Term week number
-- Academic calendar flags (finals week, break week)
+## Approach
 
-Predictions returned as occupancy level per hour slot.
+I built SPACtivity as a Flutter app with structured pages for gyms, facilities, equipment, favorites, settings, and search. The app focused on practical flows: finding a gym, checking traffic, viewing hours, seeing available equipment, opening map directions, and saving commonly used locations.
 
-## Mobile App (Flutter)
+The traffic visualization used live gym traffic data where available, supplemented by estimated fallback values when historical coverage was sparse. This kept the interface useful even when the available data was incomplete.
 
-- Interactive chart showing predicted vs. historical occupancy across the day
-- Hour-by-hour breakdown with color-coded traffic levels
-- Fetches predictions on-demand from Lambda REST API
-- Dart/Flutter with clean, minimal UI
+## Implementation
 
-## Infrastructure
+The app was organized around reusable screens, model objects, and state notifiers. Provider handled app state for favorites, theme settings, gym data, equipment data, and facility data. Google Maps integration supported location context and directions. FL Chart was used for traffic visualizations.
 
-- **AWS RDS** — PostgreSQL database storing historical entry records
-- **AWS Lambda** — serverless prediction endpoint, scales to zero between requests
-- **AWS S3** — stores trained model artifacts and static assets
-- **REST API** — Flutter client fetches predictions via HTTP
+Gym detail pages included traffic views, hours, descriptions, equipment, amenities, and map actions. Facility and equipment pages let users browse recreation options beyond a single gym list. Favorites and dark mode made the app feel more like a usable student product than a static class demo.
+
+**Stack**
+
+\`Flutter\` \`Dart\` \`Provider\` \`Google Maps\` \`FL Chart\`
+
+## Data Note
+
+SPACtivity used live Northwestern gym traffic data where available and estimated fallback values where historical coverage was incomplete. The fallback values were meant to support a more complete visualization experience, not to claim a validated forecasting model.
+
+This distinction matters because the project was built in 2023, when available historical coverage was limited. The app should be understood as a mobile product prototype with practical traffic visualization, not as a production-grade prediction system.
+
+## Limitations
+
+SPACtivity was a student project and prototype, not a production app. It was not released on the App Store and had no production user base. The traffic estimation logic was useful for filling gaps, but it was not a validated forecasting model. Some dependencies or setup steps may need updating because the project has been archived.
+
+## What I Learned
+
+SPACtivity taught me how much engineering work sits behind a simple product question. "Which gym should I go to?" required data modeling, state management, UI organization, map behavior, time and hours handling, and clear visual presentation.
+
+It also taught me to be careful with incomplete real-world data. Live data is useful, but products often need fallback behavior when coverage is sparse. The challenge is making the interface helpful without overstating what the data can prove.
+
+## Next Steps
+
+If I revisited SPACtivity, I would modernize the Flutter dependencies, clean up the data layer, and separate live traffic ingestion from fallback estimation more clearly. I would also replace the fallback estimation logic with a formal time-series baseline such as SARIMA and compare it against simpler rolling-average and day-of-week baselines. A stronger version of the project would include a small backend, clearer data provenance, and an evaluation page showing how well each traffic estimate matched observed gym usage.
 `,
   },
 
