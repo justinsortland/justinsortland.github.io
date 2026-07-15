@@ -143,7 +143,7 @@ Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deplo
       'Traffic charts used live Northwestern gym data where available, supplemented by estimated fallback values when historical coverage was sparse',
       'Provider-managed state across gym, facility, equipment, favorites, and theme layers with reusable screen and model architecture',
     ],
-    github: undefined,
+    github: 'https://github.com/justinsortland/spactivity',
     date: '2023-06-01',
     dateDisplay: '2023',
     problem:
