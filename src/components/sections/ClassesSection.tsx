@@ -32,7 +32,7 @@ const TRACKS = [
     headerBg: 'bg-violet/5',
     badgeClass: 'bg-violet/10 text-violet border-violet/30',
     dotClass: 'bg-violet',
-    codes: ['CS 336', 'IEMS 315'],
+    codes: ['CS 336', 'CS 462'],
   },
 ];
 

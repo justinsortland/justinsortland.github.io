@@ -176,7 +176,7 @@ export const PANEL_DATA: Record<string, BuildingPanel> = {
         heading: 'Theory & Algorithms',
         bullets: [
           'CS 336: Analysis of Algorithms',
-          'IEMS 315: Stochastic Processes',
+          'CS 462: Foundations of Quantum Computing and Quantum Information',
         ],
       },
       {

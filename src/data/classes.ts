@@ -66,17 +66,17 @@ export const classes: ClassItem[] = [
     ],
   },
   {
-    code: 'IEMS 315',
-    title: 'Stochastic Processes',
+    code: 'CS 462',
+    title: 'Foundations of Quantum Computing and Quantum Information',
     institution: 'Northwestern University',
     description:
-      'Markov chains (discrete and continuous-time), Poisson processes, queuing theory, martingales, and Brownian motion with applications to finance and operations research.',
-    tags: ['Math', 'Probability'],
+      'Quantum mechanics fundamentals for computing, including qubits, quantum gates, entanglement, and key quantum algorithms and protocols.',
+    tags: ['Theory', 'Quantum'],
     level: 'Undergraduate',
     takeaways: [
-      'Steady-state distributions and ergodicity for Markov chains',
-      'M/M/1 queues and Little\'s Law in system performance modeling',
-      'How Brownian motion underlies continuous-time financial models',
+      'Quantum circuit model and universal gate sets for quantum computation',
+      'Grover\'s and Shor\'s algorithms and their complexity advantages',
+      'Quantum information theory including entanglement and quantum error correction',
     ],
   },
 
