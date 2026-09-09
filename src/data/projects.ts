@@ -6,7 +6,7 @@ export const projects: Project[] = [
     slug: 'counterparty',
     title: 'Counterparty',
     description:
-      'AI-assisted permit review workflow for residential construction. Users create permit submissions, attach labeled document artifacts, request structured Claude reviews, track issue severity and missing documents, compare review revisions, and generate printable reports.',
+      'AI-assisted permit review system for residential construction, built on a durable Postgres-backed job queue, concurrency-safe workers, and deterministic jurisdiction and rule resolution. Claude handles the semantic review step (verdicts, severity-rated issues, missing documents) against evidence and applicable rules the backend has already resolved.',
     type: 'engineering',
     featured: true,
     priority: 1,
@@ -14,108 +14,186 @@ export const projects: Project[] = [
     technologies: [
       'Next.js',
       'TypeScript',
+      'PostgreSQL',
       'Prisma',
       'Supabase Auth',
       'Supabase Storage',
-      'Claude / Anthropic',
-      'PostgreSQL',
+      'Anthropic Claude',
       'Tailwind CSS',
+      'Railway',
+      'Vitest',
     ],
-    tags: ['Applied AI', 'Full-Stack', 'Document Review', 'Workflow'],
+    tags: ['Applied AI', 'Backend Systems', 'Full-Stack', 'Document Review', 'Workflow'],
     highlights: [
-      'Claude reviews project details, reviewer context, and labeled artifact metadata to return structured findings, severity ratings, missing documents, and verdicts.',
-      'Revision history tracks how findings change across review requests, with a compare view for resolved, persistent, and newly introduced issues.',
-      'Printable reports turn each review revision into a clean, shareable summary for discussion or follow-up.',
+      'Review execution runs on a durable Postgres-backed job queue: workers claim jobs with FOR UPDATE SKIP LOCKED, retry with exponential backoff, and recover stale jobs, with no separate broker.',
+      'A deterministic layer resolves the governing authority (AHJ) and applicable jurisdiction rules before Claude ever runs, instead of asking the model to guess local law from an address.',
+      'A 12-case, human-reviewed evaluation harness with decomposed consistency metrics drove four rounds of prompt calibration, raising verdict accuracy from 56.7% to 76.7%.',
     ],
     github: 'https://github.com/justinsortland/counterparty',
     date: '2026-01-01',
     dateDisplay: '2026',
     problem:
-      'Residential permit submissions are document-heavy and opaque. Homeowners and small contractors often cannot sanity-check a submission before it reaches a reviewer. On the reviewer side, findings are applied inconsistently with no shared rubric, no audit trail, and no structured way to see how a submission changed between review cycles.',
+      'Permit review is document-heavy, jurisdiction-dependent, and opaque. Homeowners and small contractors rarely know what a plan checker is looking for, reviewers apply findings inconsistently with no audit trail, and there was no way to check whether an AI reviewer would give the same answer twice.',
     approach:
-      'Users create a permit submission, attach labeled document artifacts, and request a Claude review. The review prompt includes submission fields, labeled artifact metadata, a reviewer profile, and document coverage. Claude returns structured JSON with a verdict, summary, issues by severity, and missing documents. Reviews are persisted as snapshots. A compare view tracks how findings change across revisions. A printable report summarizes each review revision.',
+      'Review execution moved off the request path onto a Postgres-backed job queue and a separate worker process. A deterministic layer resolves the governing jurisdiction, applicable rules, and document coverage before Claude ever runs, so the model is scoped to one job: interpreting evidence-grounded context against rules the backend already determined apply.',
     results:
-      'Structured reviews with severity ratings, missing document tracking, and full revision history. A compare view surfaces resolved, persistent, and newly introduced issues across revisions. Printable reports make each review revision shareable in one click.',
+      'A durable, concurrency-safe review pipeline with immutable per-revision snapshots and deterministic jurisdiction and rule resolution, checked against a 12-case human-reviewed evaluation harness. Four rounds of calibration raised verdict accuracy from 56.7% to 76.7%, with missing-document F1 and validation success both holding at 100% on every clean run.',
     content: `## Links
 
 - **GitHub:** [github.com/justinsortland/counterparty](https://github.com/justinsortland/counterparty) — source code, README, and technical writeup
-- **Demo video:** [Watch on YouTube](https://youtu.be/-JJuIGjXw1Y) — full product walkthrough
+- **Demo video:** [Watch on YouTube](https://www.youtube.com/watch?v=hC9Pf9LV-sg) — product walkthrough
 - **Live demo:** available on request
 
-## Product Walkthrough
+## What Counterparty Is
 
-The seeded demo includes a complete permit review flow for 1847 Castro St, a sample ADU submission:
+Counterparty is a permit-review workflow simulator for residential construction. Users describe a project, attach labeled documents, and request a review; Claude plays the role of a residential plan checker for the stated jurisdiction and returns a structured verdict, a summary, severity-rated issues with cited evidence, and a list of missing documents. Users can revise a submission and re-request review to track progress across revisions.
 
-- Dashboard with submissions, status, and recent review activity
-- Submission detail showing labeled artifact list and review history
-- Compare view for two review revisions, with resolved, persistent, and newly introduced issues
-- Printable report for a completed review revision
-- Review templates for common permit types
+What started as a synchronous Next.js app calling Claude directly on the request path has since grown a durable backend: review execution now runs on a Postgres-backed job queue behind concurrency-safe workers, jurisdiction and rule applicability are resolved deterministically before the model ever runs, and the review pipeline is checked against a human-reviewed evaluation harness instead of spot-checked outputs.
 
-Screenshots and a full walkthrough are in the demo video linked above.
+**Stack:** Next.js (App Router), TypeScript, PostgreSQL (Supabase), Prisma, Supabase Auth and Storage, Anthropic Claude, Tailwind CSS — deployed across Vercel (app) and Railway (worker).
 
-## Technical Implementation
+## The Problem
+
+Permit review is document-heavy, jurisdiction-dependent, and opaque. Homeowners and small contractors rarely know what a plan checker is actually looking for, and first submissions routinely get rejected for missing documents or overlooked local requirements. On the reviewer side, findings get applied inconsistently with no audit trail and no structured way to see how a submission changed between review cycles — and no way to check whether an AI reviewer would give the same answer twice.
+
+## System Architecture
+
+The product surface — submissions, artifacts, review history, compare, reports, templates — is still one Next.js application. What changed is everything between "request a review" and "get a review": that work moved off the request path onto a Postgres-backed queue and a separate worker process, with a deterministic resolution layer sitting in front of the model call.
 
 \`\`\`
-Submission fields + artifact metadata
-        │
-   Next.js server actions
-        │
-   Review profile + document coverage
-        │
-   Claude structured JSON review
-   ├── Verdict
-   ├── Summary
-   ├── Issues (severity: critical / major / minor)
-   └── Missing documents
-        │
-   Prisma transaction to Supabase Postgres
-        │
-   Dashboard, detail, compare, and report views
+Browser
+  │
+  ▼
+Next.js server action — requestReview()
+  (idempotent: reuses any job already QUEUED/RUNNING for the submission)
+  │
+  ▼
+Postgres — ReviewJob queue (review_jobs table, same database as the app)
+  │
+  ▼
+Worker process (Railway, long-running) — claimNextReviewJob()
+  FOR UPDATE SKIP LOCKED — single-statement claim + transition to RUNNING
+  │
+  ▼
+processReviewJob()
+┌─ deterministic ──────────────────────────────────────────────┐
+│ • load the exact Submission snapshot this job targets          │
+│ • selectProfile() → one of 9 permit-type review profiles       │
+│ • resolve AHJ (Census geocode + curated FIPS mapping)          │
+│ • resolve Coastal Zone applicability (fail-closed GIS check)   │
+│ • selectRulePacks() → STATE + LOCAL rule packs, composed       │
+│ • computeCoverage() → confirmed / missing documents            │
+│ • buildEvidenceCatalog() → grounded, citable review context    │
+└─────────────────────────────────────────────────────────────┘
+  │
+  ▼
+Claude (Anthropic API, temperature 0) — the probabilistic step
+  returns structured JSON: verdict, summary, issues, missingDocs
+  │
+  ▼
+┌─ deterministic ──────────────────────────────────────────────┐
+│ • validateAndNormalize() — schema + evidence-reference check   │
+│ • one SERIALIZABLE transaction: Review + ReviewIssue +         │
+│   ReviewRulePack rows, submission.status update,               │
+│   ReviewJob → SUCCEEDED (ownership-guarded)                    │
+└─────────────────────────────────────────────────────────────┘
 \`\`\`
 
-**Stack**
+There's no message broker and no microservices here — one Next.js app, one worker process, one Postgres database. The infrastructure decision that mattered was recognizing that AI review is long-running, unpredictable-latency work that doesn't belong inside a serverless request/response cycle, and giving it its own process boundary instead of adding infrastructure everywhere else.
 
-\`Next.js App Router\` \`TypeScript\` \`Prisma\` \`Supabase Auth\` \`Supabase Storage\` \`Anthropic Claude\` \`PostgreSQL\` \`Tailwind CSS\`
+## Building a Durable AI-Review Pipeline
 
-The review flow does not extract text from uploaded files or perform OCR.
+The naive version of this feature calls Claude inside the request handler and writes the result when it returns. That's fine until a review takes fifteen seconds, or times out, or a user double-clicks "Request Review," or a deploy restarts mid-call. That work now happens at the queue layer instead of being left to chance.
 
-Labeled artifact metadata (document type, filename, and reviewer-supplied context), submission fields, and a reviewer profile are assembled into a structured prompt.
+**Idempotent enqueueing.** \`requestReview()\` checks for an existing \`QUEUED\` or \`RUNNING\` job before creating a new one, and \`enqueueReviewJob()\` additionally upserts on a unique \`idempotencyKey\`. A double-submit or a page refresh can't create two competing jobs for the same logical request.
 
-Claude returns JSON with a verdict, summary, issues with severity ratings (critical, major, minor), and a list of missing or incomplete documents.
+**Concurrency-safe claiming.** Workers claim jobs with \`FOR UPDATE SKIP LOCKED\`, in a single CTE-plus-\`UPDATE ... RETURNING\` statement rather than a \`SELECT\` followed by an \`UPDATE\`. That distinction matters: a plain select-then-update is a race, since two workers can both read the same "available" row before either has written a lock. \`SKIP LOCKED\` means a worker that finds a row already locked by another worker skips it and moves on, instead of blocking or double-processing it. Counterparty runs one worker today, but the claim logic is already safe for more than one.
 
-Reviews are persisted as snapshots so past revisions remain immutable and comparable regardless of how the submission changes afterward.
+**Bounded retries, not silent failure.** A failed attempt — an Anthropic error, a timeout, an invalid JSON response — goes back to \`QUEUED\` with exponential backoff (roughly 30 seconds, then 60, then 120, and so on, capped at 15 minutes), up to a \`maxAttempts\` limit (default 3), after which the job moves to \`DEAD_LETTER\` instead of disappearing silently. A worker never sleeps waiting on a specific retry; it just polls for the next eligible job and comes back to a delayed one once its \`availableAt\` time passes.
 
-## Hard Parts
+**Transactions stay short; the model call doesn't happen inside one.** The Anthropic call happens outside any database transaction — it is slow and unpredictable, and holding a transaction open around it would hold locks for no reason. Once the model responds, persisting the review, its issues, the submission status update, and the job's \`SUCCEEDED\` transition all happen together in one short \`SERIALIZABLE\` transaction.
 
-### Structured output and validation
+**Stale-job recovery with ownership fencing.** If a worker dies mid-job, its claimed job would otherwise stay \`RUNNING\` forever. A recovery pass reclaims jobs whose lock is older than 45 minutes. Every completion or failure path is guarded on \`id + lockedBy + attempts\`, not just job id — so a worker whose job was already reclaimed out from under it (slow, not actually dead) can't come back later and commit a stale result; its write simply matches zero rows.
 
-Getting Claude to return consistent JSON across diverse submissions required careful prompt engineering and server-side validation of the response shape before any database write.
+**Immutable, revision-scoped reviews.** Every review snapshots the exact submission state it evaluated — scope of work, artifacts, jurisdiction — at the moment the job actually ran. If a user uploads a new revision after requesting a review but before a worker gets to it, the worker still evaluates the revision it was asked about, not whatever the submission looks like by the time it runs. That invariant is what makes revision history, the compare view, and printable reports trustworthy: they always reflect what Claude actually saw, not what the submission happens to look like now.
 
-### Stable revision comparison
+**A concurrency bug this surfaced.** Revision numbers were originally computed by reading the current maximum and adding one, which breaks under concurrent requests: two transactions can both read the same maximum before either commits. The fix lets Postgres enforce the invariant instead of application code: it computes the next revision number inside the same \`SERIALIZABLE\` transaction that writes the review, and if two transactions race on the same submission, Postgres aborts one of them (Prisma surfaces this as error \`P2034\`) instead of letting both silently succeed with the same number. The aborted transaction retries automatically, up to 3 attempts. The general lesson carried into the rest of the backend: a correctness invariant like "revision numbers are unique per submission" belongs at the database boundary, not in application code that assumes requests won't overlap.
 
-The compare view matches issues across revisions even when Claude phrases the same finding differently between requests. The current approach uses field-level matching on structured fields rather than string diffing.
+## Making Jurisdiction Deterministic
 
-### Immutable revision snapshots
+Which rules apply to a submission used to be entirely the model's problem — jurisdiction was a free-text field, and Claude reasoned about local requirements from training knowledge with no way to check its work. That's fine for general review commentary, but it's the wrong place to put a decision like "does this address fall under Los Angeles County" or "is this project inside the Coastal Zone." Those are facts, not judgment calls, and Counterparty now resolves them before Claude is ever called.
 
-Each review captures a snapshot of all inputs at request time, so compare and report views always reflect what was actually reviewed, not the current state of the submission.
+\`\`\`
+address
+  → US Census Geocoder (state / county / place FIPS codes)
+  → AHJ resolution against a curated, human-reviewed mapping registry
+  → Coastal Zone GIS point-classification (fail-closed to UNKNOWN)
+  → rule-pack selection, gated on confirmed AHJ + applicability facts
+  → multi-pack composition (STATE, then LOCAL)
+  → grounded, citable evidence handed to Claude
+\`\`\`
 
-### Document coverage without text extraction
+**AHJ resolution.** AHJ is short for authority having jurisdiction — the actual government office that reviews a permit, which is not always the obvious one. Counterparty geocodes the submission address through the US Census Geocoder and matches the returned FIPS codes, never the free-text place name, against a small, checked-in registry of human-reviewed mappings. Today that registry resolves two unincorporated Los Angeles County communities, Marina del Rey and East Los Angeles, to Los Angeles County as the governing authority; every other address resolves to state-level identity or stays unresolved rather than getting a guess. Getting the AHJ wrong means every downstream rule decision is wrong too, so this is exactly the kind of decision that shouldn't be left to a model's best guess from an address string.
 
-Document coverage is inferred from labeled artifact metadata, not file contents. This keeps the implementation honest about what Claude actually sees while still letting the prompt convey which document types are present or missing.
+**Coastal Zone gating.** One rule pack only applies outside the California Coastal Zone. Rather than asking Claude to reason about that, the backend queries a live Caltrans GIS layer with the submission's coordinates and stores the result as an explicit \`INSIDE\`, \`OUTSIDE\`, or \`UNKNOWN\` fact. The \`UNKNOWN\` state is real and propagates as unresolved — a missing or ambiguous GIS response is never silently treated as "outside" just because that happens to be the more permissive case. Rule selection treats \`UNKNOWN\` as a closed gate, the same as a confirmed \`INSIDE\`.
 
-### Full-stack deployment coordination
+**Rule packs, composed, not concatenated.** Jurisdictional rules live as versioned, typed "rule packs" rather than paragraphs pasted into a prompt. Each rule carries a legal effect (an agency limit, an applicant entitlement, a project requirement), a source citation, and reviewer guidance on when it may actually support a finding. A review composes at most one \`STATE\` pack (currently two human-reviewed California ADU rules: a 4-ft setback ceiling and a 16/25-ft height floor) and one \`LOCAL\` pack (a Los Angeles County ADU/JADU rental-duration rule, gated on a confirmed LA County AHJ and a Coastal Zone status of \`OUTSIDE\`). Every applied pack is recorded per review, in order, so a "Rule packs" line on a review always reflects exactly what that specific execution used, not what the submission's jurisdiction happens to resolve to today.
 
-Wiring together Supabase Auth, Supabase Storage, Prisma migrations, Vercel deploys, and Anthropic API keys across local and production environments required careful environment management and a clear seed script to establish demo state.
+**Why the split matters.** The backend's job is to answer "which authority governs this, and which rules actually apply" — a question with a correct, look-up-able answer, not a guess. Claude's job is narrower and better suited to a language model: given this evidence and these applicable rules, does the submission comply. Keeping the first question out of the prompt makes the second one more reliable, and turns jurisdiction behavior into something that can be unit tested instead of only prompt-tuned.
 
-## What I Would Improve Next
+**What's actually verified today.** The deterministic side of this chain has been checked against live external services, not only unit tests: a capped sanity run hit the real Census Geocoder and the real Caltrans Coastal Zone layer against two public addresses — a Marina del Rey waterfront park and an East Los Angeles public library — and correctly classified them \`INSIDE\` and \`OUTSIDE\`, respectively. Running that same East LA scenario all the way through the worker pipeline against a live Claude call is the planned next step for the LA County rule pack specifically; it hasn't happened yet. The geo/rule-resolution chain up to that point is verified against real government data sources; the full-pipeline model run is upcoming work, not a finished result.
 
-- OCR and document text extraction, so Claude can review actual file content rather than metadata
-- A jurisdiction or building code database to ground issue findings in specific regulations
-- Team workspaces and reviewer assignment for multi-reviewer flows
-- Rate limiting or invite gating before opening a public demo
-- Stronger response validation and retry handling for Claude API calls
+## Evaluation and Reliability
 
+Prompt changes to the reviewer used to be judged by reading a handful of outputs and deciding whether they looked reasonable. That doesn't scale and it doesn't catch regressions, so the project has a small, repeatable evaluation harness that runs the production review pipeline itself against a fixed benchmark.
+
+**The benchmark.** 12 hand-authored synthetic cases, spanning all 9 production review profiles (ADU, new construction, remodel/addition, electrical, plumbing, mechanical, zoning, grading, and generic). Every judgment-dependent expected label — each verdict, and any missing-document label that required interpreting the scope of work — was manually reviewed against the project's own documented review semantics and tagged accordingly. This is an internal review against this project's own rules, not third-party or professional plan-checker validation. Each case runs 5 times at temperature 0: 60 correlated observations per run, not 60 independent examples.
+
+**Four rounds of prompt calibration.** The harness drove four rounds of calibration on the reviewer's system prompt:
+
+| Metric | Baseline | After calibration |
+|---|---|---|
+| Verdict accuracy | 56.7% (34/60) | 76.7% (46/60) |
+| Production-validation success | 100% | 100% |
+| Missing-document F1 | 100% | 100% |
+| Verdict pairwise consistency | 96.7% | 96.7% |
+
+Verdict accuracy rose 20 points across the arc, mostly from one intervention: an early prompt version treated a genuinely missing document as automatic grounds for the harshest verdict, and the harness's own confusion matrix showed this was systematically over-escalating conditional cases to outright rejection. Fixing that one severity rule accounted for most of the gain; later rounds each produced smaller, well-understood improvements before calibration reached diminishing returns. Production has since moved to a reviewed reconstruction of the best-evidenced severity calibration from that arc, which hasn't been re-run through this exact benchmark as a new formal round — so 76.7% describes that calibration arc's final tested version, not a current, independently re-measured production score.
+
+**Missing-document F1 held at 100%** across every clean run, worth reading precisely: the model is handed a pre-computed "not yet confirmed" document list as part of its context, so this is largely a pipeline-propagation check — does the model correctly echo back data it was already given — rather than evidence of independent document reasoning.
+
+**An evaluation-infrastructure bug, caught by the harness itself.** One calibration run measured only 82% production-validation success, a sharp apparent regression. The cause wasn't the prompt: adding a new output field increased typical response length past a fixed token budget, truncating roughly one in five responses mid-JSON. Raising that budget and rerunning restored 100% validation success and the accuracy numbers above. It's a small story, but a useful one: evaluation infrastructure needs the same debugging discipline as production code, and a metric that looks like a model regression is sometimes a plumbing bug instead.
+
+**Consistency, decomposed.** A single blended consistency score originally read as close to 0%, which looked like the model barely agreeing with itself across repeated runs. Decomposing it into independent signals told a different story: verdict-level and missing-document-level consistency both held at 97–100%, meaning the model's underlying judgment was actually stable. The low blended number mostly reflected issue-level wording and categorization churn between runs — the same underlying finding, described differently — rather than the model changing its mind about the submission.
+
+**A known, bounded failure mode.** Every residual verdict error in the calibrated benchmark concentrates in 3 of the 12 cases, all "complete documentation" scenarios that should verdict as a clean approval: the model still tends to manufacture at least one significant issue rather than returning it. This has been a stable pattern across every prompt version tested — a specific, diagnosed problem, not an open-ended one.
+
+These are evaluation-harness baselines against a small, human-reviewed benchmark. They describe measured behavior on this benchmark, not production accuracy guarantees or a claim about real-world plan-checker agreement.
+
+## Engineering Decisions
+
+- **Deterministic orchestration around a probabilistic model.** Queueing, retries, concurrency control, idempotency, revision identity, jurisdiction and rule resolution, and persistence are all ordinary backend code with unit tests behind them. Claude is scoped to exactly one step — interpreting evidence-grounded context against rules the backend already determined apply — which keeps the one genuinely non-deterministic part of the system as small and inspectable as possible.
+- **Invariants belong at the database boundary, not in application code.** The revision-number race and the ownership-guarded job transitions (\`id + lockedBy + attempts\` on every fail, retry, and complete path) both follow the same principle: don't trust application code to prevent a race the database can prevent for you.
+- **Snapshots over live joins.** Reviews store the submission state they evaluated, not a foreign key to the current submission. Editing a submission afterward can never retroactively change what a past review says it saw.
+- **A worker process, not more infrastructure.** The queue is a plain Postgres table in the same database as the app — no Redis, no message broker. The infrastructure decision that actually mattered was giving long-running, unpredictable-latency AI calls their own process (a long-lived worker on Railway) instead of running them inside short-lived serverless functions on Vercel.
+- **Separate "verified" from "model-generated" everywhere it's shown.** Evidence resolved from something Counterparty actually supplied — a document excerpt, a jurisdiction rule, a scope fact — is rendered distinctly from a code reference, which is free-form, unverified model text labeled as such. The UI never blurs the two.
+
+## What's Still There
+
+The product surface this backend work sits underneath hasn't gone away:
+
+- Submission management with full revision history, and a compare view for resolved, persistent, and newly introduced issues and missing documents across revisions
+- Structured AI review — verdict, severity-rated issues, missing documents, and cited evidence — with a "what to do next" remediation suggestion per issue
+- PDF and DOCX text extraction, with an OCR fallback for scanned PDFs, so reviews can cite actual document excerpts rather than only artifact labels
+- Printable, per-revision reports
+- Reusable submission templates
+- Supabase-backed authentication and Postgres-backed application state
+
+## Current State and What's Next
+
+Counterparty runs as a deployed, end-to-end system: Vercel for the Next.js app, a long-running worker on Railway, and Supabase for Postgres, auth, and file storage. It's a working prototype and a considerably more serious piece of backend engineering than the original synchronous version — not a production service handling real permit traffic, and the evaluation numbers above should be read as benchmark baselines, not accuracy guarantees.
+
+Planned next: the East LA rental-duration rule's first live-model integration test through the full worker pipeline; broader AHJ and rule-pack coverage beyond the current California ADU pilot; photo and image content understanding for artifacts OCR can't recover as text; and multi-user workspace support, for which the underlying membership schema is already in place.
 `,
   },
 
